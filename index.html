@@ -7,7 +7,7 @@
   <meta name="description" content="mbnotes.online – fast local-first notes">
   <title>mbnotes.online</title>
   
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23d97706'/><text y='.9em' font-size='80' x='10'>MB</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23d97706'/><text y='.9em' font-size='70' x='12' fill='white' font-family='system-ui'>🗒️</text></svg>">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -21,47 +21,23 @@
     .masonry-item { break-inside: avoid; margin-bottom: 1rem; }
 
     .note-link {
-      display: inline;
-      padding: 0.1em 0.4em;
-      margin: 0 0.05em;
-      border-radius: 0.3em;
-      font-weight: 500;
-      font-size: 0.92em;
-      cursor: pointer;
-      background: #fef3c7;
-      color: #b45309;
-      border: 1px solid #fcd34d;
+      display: inline; padding: 0.1em 0.4em; margin: 0 0.05em;
+      border-radius: 0.3em; font-weight: 500; font-size: 0.92em; cursor: pointer;
+      background: #fef3c7; color: #b45309; border: 1px solid #fcd34d;
     }
     .note-link:hover { background: #fde68a; }
 
     .note-actions {
-      opacity: 0;
-      transform: scale(0.95);
-      transition: opacity 0.15s, transform 0.15s;
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      opacity: 0; transform: scale(0.95); transition: opacity 0.15s, transform 0.15s;
+      background: #ffffff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
-    .note-card:hover .note-actions,
-    .note-card:focus-within .note-actions {
-      opacity: 1;
-      transform: scale(1);
+    .note-card:hover .note-actions, .note-card:focus-within .note-actions {
+      opacity: 1; transform: scale(1);
     }
-    .dark .note-actions {
-      background: #1e293b;
-      border-color: #334155;
-    }
+    .dark .note-actions { background: #1e293b; border-color: #334155; }
 
-    .attachment-chip {
-      background: #f3f4f6;
-      color: #374151;
-      border: 1px solid #e5e7eb;
-    }
-    .dark .attachment-chip {
-      background: #334155;
-      color: #e2e8f0;
-      border-color: #475569;
-    }
+    .attachment-chip { background: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
+    .dark .attachment-chip { background: #334155; color: #e2e8f0; border-color: #475569; }
 
     .dark body, .dark { background: #0f172a; color: #e2e8f0; }
     .dark .bg-white { background: #1e293b !important; }
@@ -74,13 +50,9 @@
     .dark .text-gray-500, .dark .text-gray-400 { color: #64748b !important; }
 
     .dark input, .dark textarea, .dark [contenteditable] {
-      background: #1e293b !important;
-      color: #f1f5f9 !important;
-      border-color: #334155 !important;
+      background: #1e293b !important; color: #f1f5f9 !important; border-color: #334155 !important;
     }
-    .dark input::placeholder, .dark textarea::placeholder {
-      color: #64748b !important;
-    }
+    .dark input::placeholder, .dark textarea::placeholder { color: #64748b !important; }
 
     .dark .note-amber { background: #78350f !important; color: #fef3c7 !important; }
     .dark .note-emerald { background: #064e3b !important; color: #d1fae5 !important; }
@@ -89,64 +61,33 @@
     .dark .note-rose { background: #9f1239 !important; color: #ffe4e6 !important; }
     .dark .note-white { background: #1e293b !important; }
 
-    .dark .note-link {
-      background: #92400e;
-      color: #fde68a;
-      border-color: #b45309;
-    }
+    .dark .note-link { background: #92400e; color: #fde68a; border-color: #b45309; }
 
     .theme-switch {
-      position: relative;
-      width: 44px;
-      height: 24px;
-      background: #d1d5db;
-      border-radius: 9999px;
-      cursor: pointer;
-      transition: background 0.2s;
+      position: relative; width: 44px; height: 24px; background: #d1d5db;
+      border-radius: 9999px; cursor: pointer; transition: background 0.2s;
     }
     .theme-switch::after {
-      content: '';
-      position: absolute;
-      top: 2px; left: 2px;
-      width: 20px; height: 20px;
-      background: white;
-      border-radius: 50%;
-      transition: transform 0.2s;
+      content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px;
+      background: white; border-radius: 50%; transition: transform 0.2s;
       box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
     .dark .theme-switch { background: #f59e0b; }
     .dark .theme-switch::after { transform: translateX(20px); }
 
-    [contenteditable] {
-      min-height: 60px;
-      outline: none;
-      line-height: 1.5;
-    }
+    [contenteditable] { min-height: 60px; outline: none; line-height: 1.5; }
     [contenteditable]:empty:before {
-      content: attr(data-placeholder);
-      color: #9ca3af;
-      pointer-events: none;
+      content: attr(data-placeholder); color: #9ca3af; pointer-events: none;
     }
     .dark [contenteditable]:empty:before { color: #64748b; }
 
-    .format-btn.active {
-      background: #fef3c7;
-      color: #b45309;
-    }
-    .dark .format-btn.active {
-      background: #92400e;
-      color: #fde68a;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      * { transition: none !important; }
-    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
   <header class="bg-white border-b sticky top-0 z-40 px-3 py-2.5 flex items-center gap-3 shadow-sm">
-    <button id="sidebar-toggle" class="md:hidden p-2.5 text-gray-500 hover:bg-gray-100 rounded-lg" aria-label="Open menu">
+    <button id="sidebar-toggle" class="md:hidden p-2.5 text-gray-500 hover:bg-gray-100 rounded-lg">
       <i class="fa-solid fa-bars"></i>
     </button>
     <div class="flex items-center gap-2 shrink-0">
@@ -166,7 +107,7 @@
     </div>
 
     <div class="flex items-center gap-3">
-      <button id="theme-toggle" class="theme-switch" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
+      <button id="theme-toggle" class="theme-switch" title="Toggle dark mode"></button>
       <button onclick="app.exportJSON()" class="p-2.5 text-gray-600 hover:bg-gray-100 rounded-lg" title="Export backup">
         <i class="fa-solid fa-download"></i>
       </button>
@@ -257,6 +198,9 @@
           <div class="text-5xl mb-4 opacity-40"><i class="fa-solid fa-pen-to-square"></i></div>
           <p class="font-medium text-gray-600">No notes yet</p>
           <p class="text-sm mt-2 max-w-xs mx-auto">Type above and press Ctrl + Enter to save.</p>
+          <button onclick="app.seedDemoNotes()" class="mt-6 px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-xl transition">
+            Load demo notes
+          </button>
         </div>
       </div>
     </main>
@@ -333,10 +277,10 @@ class MBNotes {
     this.editItems = [];
     this.editAttachments = [];
     this.editingId = null;
-    
     this.undoStack = [];
     this.redoStack = [];
     this.maxHistory = 40;
+    this.STORAGE_KEY = 'mbnotes_notes_v3';
     
     this.init();
   }
@@ -348,117 +292,38 @@ class MBNotes {
       document.documentElement.classList.add('dark');
     }
 
-    // Load notes with high reliability
-    await this.loadNotes();
+    this.loadNotes();
     this.bindEvents();
     this.render();
 
-    // Only seed demo notes if storage is completely empty
-    if (this.notes.length === 0) {
+    // Seed demo notes on first visit
+    const hasVisited = localStorage.getItem('mbnotes_has_visited');
+    if (!hasVisited && this.notes.length === 0) {
       this.seedDemoNotes();
+      localStorage.setItem('mbnotes_has_visited', 'true');
     }
   }
 
-  // ---------- RELIABLE STORAGE (Chrome-friendly) ----------
-  async loadNotes() {
-    let fromLocal = [];
-    let fromIDB = [];
-
-    // 1. Always try localStorage first (most reliable on file:// and Chrome)
+  loadNotes() {
     try {
-      const raw = localStorage.getItem('mbnotes_notes_v2');
-      if (raw) fromLocal = JSON.parse(raw);
-    } catch (e) {
-      console.warn('localStorage read failed', e);
-    }
-
-    // 2. Try IndexedDB
-    try {
-      fromIDB = await this.loadFromIDB();
-    } catch (e) {
-      console.warn('IndexedDB read failed', e);
-    }
-
-    // 3. Choose the best source (prefer the one with more notes / newer data)
-    if (fromLocal.length >= fromIDB.length) {
-      this.notes = fromLocal;
-    } else {
-      this.notes = fromIDB;
-      // Sync back to localStorage
-      this.saveToLocalStorage();
-    }
-
-    // Normalize
-    this.notes.forEach(n => {
-      if (!n.updatedAt) n.updatedAt = new Date().toISOString();
-      if (!n.darkClass) n.darkClass = this.colorToDark(n.color);
-      if (!n.attachments) n.attachments = [];
-      if (!n.tags) n.tags = [];
-    });
-  }
-
-  saveToLocalStorage() {
-    try {
-      localStorage.setItem('mbnotes_notes_v2', JSON.stringify(this.notes));
-    } catch (e) {
-      console.error('localStorage write failed', e);
-      alert('Storage full or blocked. Please export your notes as backup.');
-    }
-  }
-
-  async loadFromIDB() {
-    return new Promise((resolve) => {
-      const request = indexedDB.open('MBNotesDB', 5);
-      
-      request.onupgradeneeded = (e) => {
-        const db = e.target.result;
-        if (!db.objectStoreNames.contains('notes')) {
-          db.createObjectStore('notes', { keyPath: 'id' });
-        }
-      };
-
-      request.onsuccess = (e) => {
-        const db = e.target.result;
-        if (!db.objectStoreNames.contains('notes')) {
-          resolve([]);
+      const raw = localStorage.getItem(this.STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          this.notes = parsed;
           return;
         }
-        const tx = db.transaction('notes', 'readonly');
-        const store = tx.objectStore('notes');
-        const getAll = store.getAll();
-        getAll.onsuccess = () => resolve(getAll.result || []);
-        getAll.onerror = () => resolve([]);
-      };
-
-      request.onerror = () => resolve([]);
-    });
+      }
+    } catch (e) {}
+    this.notes = [];
   }
 
-  async saveToIDB() {
-    return new Promise((resolve) => {
-      const request = indexedDB.open('MBNotesDB', 5);
-      request.onsuccess = (e) => {
-        const db = e.target.result;
-        if (!db.objectStoreNames.contains('notes')) {
-          resolve();
-          return;
-        }
-        const tx = db.transaction('notes', 'readwrite');
-        const store = tx.objectStore('notes');
-        store.clear();
-        this.notes.forEach(n => store.put(n));
-        tx.oncomplete = () => resolve();
-        tx.onerror = () => resolve();
-      };
-      request.onerror = () => resolve();
-    });
-  }
-
-  async persist() {
-    // Primary: localStorage (most reliable)
-    this.saveToLocalStorage();
-    // Secondary: IndexedDB
-    await this.saveToIDB();
+  persist() {
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.notes));
+    } catch (e) {
+      alert('Could not save notes. Please export a backup.');
+    }
   }
 
   seedDemoNotes() {
@@ -466,7 +331,7 @@ class MBNotes {
       {
         id: crypto.randomUUID(),
         title: 'Welcome to mbnotes.online',
-        content: 'A fast, local-first notes app that lives entirely in your browser.<br><br>Try these features:<br>• Select text and use <b>Bold</b>, <i>Italic</i>, <u>Underline</u> or <s>Strikethrough</s><br>• Link notes with [[Project ideas]]<br>• Add #tags<br>• Attach images & files with the paperclip<br>• Turn any note into a checklist<br><br>Everything stays on your device. No account needed.',
+        content: 'A fast, local-first notes app that lives entirely in your browser.<br><br><b>Try these features:</b><br>• Select text → use <b>Bold</b>, <i>Italic</i>, <u>Underline</u> or <s>Strikethrough</s><br>• Link notes with [[Project ideas]]<br>• Add #tags<br>• Attach images & files<br>• Turn any note into a checklist<br><br>Everything stays on your device. No account needed.',
         color: 'bg-amber-100',
         darkClass: 'note-amber',
         pinned: true,
@@ -520,7 +385,7 @@ class MBNotes {
     this.render();
   }
 
-  // ---------- Rest of the app (unchanged logic) ----------
+  // ========== All other methods (unchanged from your last working version) ==========
   colorToDark(color) {
     return {
       'bg-white': 'note-white', 'bg-amber-100': 'note-amber', 'bg-emerald-100': 'note-emerald',
@@ -684,10 +549,6 @@ class MBNotes {
     this.redoStack = [];
   }
 
-  // ... (the rest of the methods stay exactly the same as previous version)
-  // For brevity I'm keeping the structure — all other methods (saveNote, openNote, render, etc.)
-  // remain identical to the last working version.
-
   async handleFiles(event, mode) {
     for (const file of Array.from(event.target.files)) {
       if (file.size > 4 * 1024 * 1024) {
@@ -791,7 +652,7 @@ class MBNotes {
       updatedAt: new Date().toISOString()
     };
     this.notes.unshift(note);
-    await this.persist();
+    this.persist();
     this.closeCapture();
     this.render();
   }
@@ -844,7 +705,7 @@ class MBNotes {
     note.attachments = [...this.editAttachments];
     note.tags = this.extractTags(note.title + ' ' + note.content.replace(/<[^>]+>/g, ''));
     note.updatedAt = new Date().toISOString();
-    await this.persist();
+    this.persist();
     this.closeModal();
     this.render();
   }
@@ -873,14 +734,14 @@ class MBNotes {
     if (!note) return;
     note[field] = !note[field];
     note.updatedAt = new Date().toISOString();
-    await this.persist();
+    this.persist();
     this.render();
   }
 
   async deletePermanent(id) {
     if (!confirm('Delete this note permanently?')) return;
     this.notes = this.notes.filter(n => n.id !== id);
-    await this.persist();
+    this.persist();
     this.render();
   }
 
@@ -889,7 +750,7 @@ class MBNotes {
     if (!note?.checklistItems?.[idx]) return;
     note.checklistItems[idx].completed = !note.checklistItems[idx].completed;
     note.updatedAt = new Date().toISOString();
-    await this.persist();
+    this.persist();
     this.render();
   }
 
@@ -1043,7 +904,7 @@ class MBNotes {
       if (!Array.isArray(data)) throw new Error();
       if (!confirm(`Import ${data.length} notes? This replaces your current notes.`)) return;
       this.notes = data;
-      await this.persist();
+      this.persist();
       this.render();
     } catch {
       alert('Could not read that file.');
