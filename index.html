@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#d97706">
+  <meta name="description" content="mbnotes.online – fast local-first notes">
+  <title>mbnotes.online</title>
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23d97706'/><text y='.9em' font-size='80' x='10'>MB</text></svg>">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .masonry { column-count: 1; column-gap: 1rem; }
+    @media (min-width: 640px) { .masonry { column-count: 2; } }
+    @media (min-width: 1024px) { .masonry { column-count: 3; } }
+    @media (min-width: 1400px) { .masonry { column-count: 4; } }
+    .masonry-item { break-inside: avoid; margin-bottom: 1rem; }
+
+    .note-link {
+      display: inline;
+      padding: 0.1em 0.4em;
+      margin: 0 0.05em;
+      border-radius: 0.3em;
+      font-weight: 500;
+      font-size: 0.92em;
+      cursor: pointer;
+      background: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fcd34d;
+    }
+    .note-link:hover { background: #fde68a; }
+
+    .note-actions {
+      opacity: 0;
+      transform: scale(0.95);
+      transition: opacity 0.15s, transform 0.15s;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .note-card:hover .note-actions,
+    .note-card:focus-within .note-actions {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .dark .note-actions {
+      background: #1e293b;
+      border-color: #334155;
+    }
+
+    .attachment-chip {
+      background: #f3f4f6;
+      color: #374151;
+      border: 1px solid #e5e7eb;
+    }
+    .dark .attachment-chip {
+      background: #334155;
+      color: #e2e8f0;
+      border-color: #475569;
+    }
+
+    .dark body, .dark { background: #0f172a; color: #e2e8f0; }
+    .dark .bg-white { background: #1e293b !important; }
+    .dark .bg-gray-50 { background: #0f172a !important; }
+    .dark .bg-gray-100 { background: #334155 !important; }
+    .dark .border-gray-200, .dark .border-gray-100 { border-color: #334155 !important; }
+    .dark .text-gray-800, .dark .text-gray-900 { color: #f1f5f9 !important; }
+    .dark .text-gray-700 { color: #cbd5e1 !important; }
+    .dark .text-gray-600 { color: #94a3b8 !important; }
+    .dark .text-gray-500, .dark .text-gray-400 { color: #64748b !important; }
+
+    .dark input, .dark textarea, .dark [contenteditable] {
+      background: #1e293b !important;
+      color: #f1f5f9 !important;
+      border-color: #334155 !important;
+    }
+    .dark input::placeholder, .dark textarea::placeholder {
+      color: #64748b !important;
+    }
+
+    .dark .note-amber { background: #78350f !important; color: #fef3c7 !important; }
+    .dark .note-emerald { background: #064e3b !important; color: #d1fae5 !important; }
+    .dark .note-sky { background: #0c4a6e !important; color: #e0f2fe !important; }
+    .dark .note-purple { background: #4c1d95 !important; color: #ede9fe !important; }
+    .dark .note-rose { background: #9f1239 !important; color: #ffe4e6 !important; }
+    .dark .note-white { background: #1e293b !important; }
+
+    .dark .note-link {
+      background: #92400e;
+      color: #fde68a;
+      border-color: #b45309;
+    }
+
+    .theme-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #d1d5db;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .theme-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 20px; height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .dark .theme-switch { background: #f59e0b; }
+    .dark .theme-switch::after { transform: translateX(20px); }
+
+    [contenteditable] {
+      min-height: 60px;
+      outline: none;
+      line-height: 1.5;
+    }
+    [contenteditable]:empty:before {
+      content: attr(data-placeholder);
+      color: #9ca3af;
+      pointer-events: none;
+    }
+    .dark [contenteditable]:empty:before { color: #64748b; }
+
+    .format-btn.active {
+      background: #fef3c7;
+      color: #b45309;
+    }
+    .dark .format-btn.active {
+      background: #92400e;
+      color: #fde68a;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+
+  <header class="bg-white border-b sticky top-0 z-40 px-3 py-2.5 flex items-center gap-3 shadow-sm">
+    <button id="sidebar-toggle" class="md:hidden p-2.5 text-gray-500 hover:bg-gray-100 rounded-lg" aria-label="Open menu">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+    <div class="flex items-center gap-2 shrink-0">
+      <div class="bg-amber-500 text-white w-9 h-9 rounded-xl flex items-center justify-center shadow">
+        <i class="fa-solid fa-feather"></i>
+      </div>
+      <div class="hidden sm:block">
+        <div class="font-bold text-lg tracking-tight leading-none">mbnotes.online</div>
+        <div class="text-[11px] text-gray-400 font-medium">Alpha Release · v1.0</div>
+      </div>
+    </div>
+
+    <div class="flex-1 max-w-2xl relative">
+      <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></i>
+      <input id="search" type="search" placeholder="Search notes…" 
+             class="w-full pl-9 pr-4 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white outline-none">
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button id="theme-toggle" class="theme-switch" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
+      <button onclick="app.exportJSON()" class="p-2.5 text-gray-600 hover:bg-gray-100 rounded-lg" title="Export backup">
+        <i class="fa-solid fa-download"></i>
+      </button>
+      <label class="p-2.5 text-gray-600 hover:bg-gray-100 rounded-lg cursor-pointer" title="Import backup">
+        <i class="fa-solid fa-upload"></i>
+        <input type="file" accept=".json" class="hidden" onchange="app.importJSON(event)">
+      </label>
+    </div>
+  </header>
+
+  <div class="flex flex-1 overflow-hidden">
+    <aside id="sidebar" class="w-60 bg-white border-r flex flex-col absolute inset-y-0 left-0 z-30 transform -translate-x-full md:static md:translate-x-0 transition-transform pt-14 md:pt-0">
+      <nav class="p-3 space-y-1 flex-1 overflow-y-auto">
+        <button data-filter="all" class="nav-btn active w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium">
+          <i class="fa-solid fa-lightbulb w-5 text-center"></i> All Notes
+        </button>
+        <button data-filter="pinned" class="nav-btn w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100">
+          <i class="fa-solid fa-thumbtack w-5 text-center"></i> Pinned
+        </button>
+        <button data-filter="checklist" class="nav-btn w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100">
+          <i class="fa-solid fa-square-check w-5 text-center"></i> Checklists
+        </button>
+        <button data-filter="archive" class="nav-btn w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100">
+          <i class="fa-solid fa-box-archive w-5 text-center"></i> Archive
+        </button>
+        <button data-filter="trash" class="nav-btn w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100">
+          <i class="fa-solid fa-trash w-5 text-center"></i> Trash
+        </button>
+        <div class="pt-5">
+          <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Tags</p>
+          <div id="tag-list" class="space-y-0.5"></div>
+        </div>
+      </nav>
+      <div class="p-3 border-t text-[11px] text-gray-400 text-center">Local-first • No account needed</div>
+    </aside>
+
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-black/40 z-20 hidden md:hidden"></div>
+
+    <main class="flex-1 overflow-y-auto p-4 md:p-6">
+      <div id="capture" class="max-w-2xl mx-auto mb-8 bg-white rounded-2xl border shadow-sm transition-all">
+        <div class="p-4">
+          <input id="c-title" placeholder="Title (optional)" class="w-full font-semibold text-gray-900 placeholder-gray-400 outline-none mb-2 hidden">
+          
+          <div id="c-format-bar" class="hidden flex items-center gap-1 mb-2 pb-2 border-b border-gray-100">
+            <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="bold" title="Bold"><i class="fa-solid fa-bold text-sm"></i></button>
+            <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="italic" title="Italic"><i class="fa-solid fa-italic text-sm"></i></button>
+            <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="underline" title="Underline"><i class="fa-solid fa-underline text-sm"></i></button>
+            <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="strikeThrough" title="Strikethrough"><i class="fa-solid fa-strikethrough text-sm"></i></button>
+            <div class="w-px h-4 bg-gray-200 mx-1"></div>
+            <button onclick="app.undo()" class="p-1.5 rounded hover:bg-gray-100" title="Undo"><i class="fa-solid fa-rotate-left text-sm"></i></button>
+            <button onclick="app.redo()" class="p-1.5 rounded hover:bg-gray-100" title="Redo"><i class="fa-solid fa-rotate-right text-sm"></i></button>
+          </div>
+
+          <div id="c-content" contenteditable="true" 
+               class="w-full text-sm text-gray-700 outline-none min-h-[42px]"
+               data-placeholder="Write a note…  #tags  [[links]]"></div>
+          
+          <div id="c-attachments" class="flex flex-wrap gap-2 mt-3 hidden"></div>
+          <div id="c-checklist" class="hidden mt-3 space-y-1.5"></div>
+        </div>
+        
+        <div id="c-controls" class="hidden px-4 py-2.5 bg-gray-50 border-t rounded-b-2xl flex items-center justify-between">
+          <div class="flex items-center gap-1">
+            <div class="flex gap-1.5 mr-2">
+              <button data-color="bg-white" data-dark="note-white" class="color-btn w-6 h-6 rounded-full bg-white border border-gray-300"></button>
+              <button data-color="bg-amber-100" data-dark="note-amber" class="color-btn w-6 h-6 rounded-full bg-amber-200 border border-amber-300"></button>
+              <button data-color="bg-emerald-100" data-dark="note-emerald" class="color-btn w-6 h-6 rounded-full bg-emerald-200 border border-emerald-300"></button>
+              <button data-color="bg-sky-100" data-dark="note-sky" class="color-btn w-6 h-6 rounded-full bg-sky-200 border border-sky-300"></button>
+              <button data-color="bg-purple-100" data-dark="note-purple" class="color-btn w-6 h-6 rounded-full bg-purple-200 border border-purple-300"></button>
+              <button data-color="bg-rose-100" data-dark="note-rose" class="color-btn w-6 h-6 rounded-full bg-rose-200 border border-rose-300"></button>
+            </div>
+            <button id="toggle-checklist" class="p-2 text-gray-600 hover:bg-gray-200 rounded-lg" title="Checklist"><i class="fa-solid fa-square-check"></i></button>
+            <label class="p-2 text-gray-600 hover:bg-gray-200 rounded-lg cursor-pointer" title="Attach file">
+              <i class="fa-solid fa-paperclip"></i>
+              <input type="file" class="hidden" multiple accept="image/*,.pdf,.txt,.md,.doc,.docx,.zip" onchange="app.handleFiles(event, 'capture')">
+            </label>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="app.closeCapture()" class="px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-200 rounded-lg">Cancel</button>
+            <button onclick="app.saveNote()" class="px-4 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-lg">Save note</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="max-w-6xl mx-auto">
+        <div id="notes" class="masonry"></div>
+        <div id="empty" class="hidden text-center py-20 text-gray-400">
+          <div class="text-5xl mb-4 opacity-40"><i class="fa-solid fa-pen-to-square"></i></div>
+          <p class="font-medium text-gray-600">No notes yet</p>
+          <p class="text-sm mt-2 max-w-xs mx-auto">Type above and press Ctrl + Enter to save.</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Edit Modal -->
+  <div id="modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+    <div id="modal-card" class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div class="p-5">
+        <input id="e-title" class="w-full font-bold text-lg outline-none border-b pb-2 mb-3" placeholder="Title">
+        
+        <div class="flex items-center gap-1 mb-2 pb-2 border-b border-gray-100">
+          <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="bold" title="Bold"><i class="fa-solid fa-bold text-sm"></i></button>
+          <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="italic" title="Italic"><i class="fa-solid fa-italic text-sm"></i></button>
+          <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="underline" title="Underline"><i class="fa-solid fa-underline text-sm"></i></button>
+          <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="strikeThrough" title="Strikethrough"><i class="fa-solid fa-strikethrough text-sm"></i></button>
+          <div class="w-px h-4 bg-gray-200 mx-1"></div>
+          <button onclick="app.undo()" class="p-1.5 rounded hover:bg-gray-100" title="Undo"><i class="fa-solid fa-rotate-left text-sm"></i></button>
+          <button onclick="app.redo()" class="p-1.5 rounded hover:bg-gray-100" title="Redo"><i class="fa-solid fa-rotate-right text-sm"></i></button>
+        </div>
+
+        <div id="e-content" contenteditable="true" 
+             class="w-full text-sm outline-none min-h-[100px] mb-3"
+             data-placeholder="Write something…"></div>
+        
+        <div id="e-attachments" class="flex flex-wrap gap-2 mb-3"></div>
+        <div id="e-checklist" class="space-y-1.5 mb-4 hidden"></div>
+
+        <div id="backlinks" class="hidden mb-4 pt-3 border-t">
+          <p class="text-xs font-semibold text-gray-400 uppercase mb-2">Linked from</p>
+          <div id="backlinks-list" class="flex flex-wrap gap-1.5"></div>
+        </div>
+
+        <div class="flex items-center justify-between pt-3 border-t gap-2 flex-wrap">
+          <div class="flex items-center gap-1">
+            <div class="flex gap-1.5">
+              <button data-ecolor="bg-white" data-edark="note-white" class="ecolor-btn w-6 h-6 rounded-full bg-white border border-gray-300"></button>
+              <button data-ecolor="bg-amber-100" data-edark="note-amber" class="ecolor-btn w-6 h-6 rounded-full bg-amber-200 border border-amber-300"></button>
+              <button data-ecolor="bg-emerald-100" data-edark="note-emerald" class="ecolor-btn w-6 h-6 rounded-full bg-emerald-200 border border-emerald-300"></button>
+              <button data-ecolor="bg-sky-100" data-edark="note-sky" class="ecolor-btn w-6 h-6 rounded-full bg-sky-200 border border-sky-300"></button>
+              <button data-ecolor="bg-purple-100" data-edark="note-purple" class="ecolor-btn w-6 h-6 rounded-full bg-purple-200 border border-purple-300"></button>
+              <button data-ecolor="bg-rose-100" data-edark="note-rose" class="ecolor-btn w-6 h-6 rounded-full bg-rose-200 border border-rose-300"></button>
+            </div>
+            <button id="e-toggle-checklist" class="p-2 text-gray-600 hover:bg-gray-200 rounded-lg" title="Convert to checklist"><i class="fa-solid fa-square-check"></i></button>
+            <label class="p-2 text-gray-600 hover:bg-gray-200 rounded-lg cursor-pointer" title="Attach file">
+              <i class="fa-solid fa-paperclip"></i>
+              <input type="file" class="hidden" multiple accept="image/*,.pdf,.txt,.md,.doc,.docx,.zip" onchange="app.handleFiles(event, 'edit')">
+            </label>
+            <button id="share-btn" class="p-2 text-gray-600 hover:bg-gray-200 rounded-lg" title="Share note"><i class="fa-solid fa-share-nodes"></i></button>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="app.closeModal()" class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-xl">Cancel</button>
+            <button onclick="app.updateNote()" class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-xl">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+class MBNotes {
+  constructor() {
+    this.notes = [];
+    this.filter = 'all';
+    this.tagFilter = null;
+    this.query = '';
+    this.captureColor = 'bg-white';
+    this.captureDark = 'note-white';
+    this.captureChecklist = false;
+    this.captureItems = [];
+    this.captureAttachments = [];
+    this.editColor = 'bg-white';
+    this.editDark = 'note-white';
+    this.editItems = [];
+    this.editAttachments = [];
+    this.editingId = null;
+    
+    this.undoStack = [];
+    this.redoStack = [];
+    this.maxHistory = 40;
+    
+    this.init();
+  }
+
+  async init() {
+    // Theme
+    const savedTheme = localStorage.getItem('mbnotes-theme');
+    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+
+    // Load notes with high reliability
+    await this.loadNotes();
+    this.bindEvents();
+    this.render();
+
+    // Only seed demo notes if storage is completely empty
+    if (this.notes.length === 0) {
+      this.seedDemoNotes();
+    }
+  }
+
+  // ---------- RELIABLE STORAGE (Chrome-friendly) ----------
+  async loadNotes() {
+    let fromLocal = [];
+    let fromIDB = [];
+
+    // 1. Always try localStorage first (most reliable on file:// and Chrome)
+    try {
+      const raw = localStorage.getItem('mbnotes_notes_v2');
+      if (raw) fromLocal = JSON.parse(raw);
+    } catch (e) {
+      console.warn('localStorage read failed', e);
+    }
+
+    // 2. Try IndexedDB
+    try {
+      fromIDB = await this.loadFromIDB();
+    } catch (e) {
+      console.warn('IndexedDB read failed', e);
+    }
+
+    // 3. Choose the best source (prefer the one with more notes / newer data)
+    if (fromLocal.length >= fromIDB.length) {
+      this.notes = fromLocal;
+    } else {
+      this.notes = fromIDB;
+      // Sync back to localStorage
+      this.saveToLocalStorage();
+    }
+
+    // Normalize
+    this.notes.forEach(n => {
+      if (!n.updatedAt) n.updatedAt = new Date().toISOString();
+      if (!n.darkClass) n.darkClass = this.colorToDark(n.color);
+      if (!n.attachments) n.attachments = [];
+      if (!n.tags) n.tags = [];
+    });
+  }
+
+  saveToLocalStorage() {
+    try {
+      localStorage.setItem('mbnotes_notes_v2', JSON.stringify(this.notes));
+    } catch (e) {
+      console.error('localStorage write failed', e);
+      alert('Storage full or blocked. Please export your notes as backup.');
+    }
+  }
+
+  async loadFromIDB() {
+    return new Promise((resolve) => {
+      const request = indexedDB.open('MBNotesDB', 5);
+      
+      request.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('notes')) {
+          db.createObjectStore('notes', { keyPath: 'id' });
+        }
+      };
+
+      request.onsuccess = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('notes')) {
+          resolve([]);
+          return;
+        }
+        const tx = db.transaction('notes', 'readonly');
+        const store = tx.objectStore('notes');
+        const getAll = store.getAll();
+        getAll.onsuccess = () => resolve(getAll.result || []);
+        getAll.onerror = () => resolve([]);
+      };
+
+      request.onerror = () => resolve([]);
+    });
+  }
+
+  async saveToIDB() {
+    return new Promise((resolve) => {
+      const request = indexedDB.open('MBNotesDB', 5);
+      request.onsuccess = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('notes')) {
+          resolve();
+          return;
+        }
+        const tx = db.transaction('notes', 'readwrite');
+        const store = tx.objectStore('notes');
+        store.clear();
+        this.notes.forEach(n => store.put(n));
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => resolve();
+      };
+      request.onerror = () => resolve();
+    });
+  }
+
+  async persist() {
+    // Primary: localStorage (most reliable)
+    this.saveToLocalStorage();
+    // Secondary: IndexedDB
+    await this.saveToIDB();
+  }
+
+  seedDemoNotes() {
+    this.notes = [
+      {
+        id: crypto.randomUUID(),
+        title: 'Welcome to mbnotes.online',
+        content: 'A fast, local-first notes app that lives entirely in your browser.<br><br>Try these features:<br>• Select text and use <b>Bold</b>, <i>Italic</i>, <u>Underline</u> or <s>Strikethrough</s><br>• Link notes with [[Project ideas]]<br>• Add #tags<br>• Attach images & files with the paperclip<br>• Turn any note into a checklist<br><br>Everything stays on your device. No account needed.',
+        color: 'bg-amber-100',
+        darkClass: 'note-amber',
+        pinned: true,
+        isChecklist: false,
+        checklistItems: [],
+        attachments: [],
+        tags: ['welcome'],
+        archived: false,
+        trashed: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: crypto.randomUUID(),
+        title: 'Project ideas',
+        content: 'A place for things you might build later.<br><br>You can link back to this note from anywhere using [[Project ideas]].',
+        color: 'bg-white',
+        darkClass: 'note-white',
+        pinned: false,
+        isChecklist: false,
+        checklistItems: [],
+        attachments: [],
+        tags: ['ideas'],
+        archived: false,
+        trashed: false,
+        createdAt: new Date(Date.now() - 3600000).toISOString(),
+        updatedAt: new Date(Date.now() - 3600000).toISOString()
+      },
+      {
+        id: crypto.randomUUID(),
+        title: 'Shopping list',
+        content: '',
+        color: 'bg-emerald-100',
+        darkClass: 'note-emerald',
+        pinned: false,
+        isChecklist: true,
+        checklistItems: [
+          { text: 'Milk', completed: false },
+          { text: 'Eggs', completed: true },
+          { text: 'Sourdough bread', completed: false }
+        ],
+        attachments: [],
+        tags: ['personal'],
+        archived: false,
+        trashed: false,
+        createdAt: new Date(Date.now() - 7200000).toISOString(),
+        updatedAt: new Date(Date.now() - 7200000).toISOString()
+      }
+    ];
+    this.persist();
+    this.render();
+  }
+
+  // ---------- Rest of the app (unchanged logic) ----------
+  colorToDark(color) {
+    return {
+      'bg-white': 'note-white', 'bg-amber-100': 'note-amber', 'bg-emerald-100': 'note-emerald',
+      'bg-sky-100': 'note-sky', 'bg-purple-100': 'note-purple', 'bg-rose-100': 'note-rose'
+    }[color] || 'note-white';
+  }
+
+  saveState(html) {
+    this.undoStack.push(html);
+    if (this.undoStack.length > this.maxHistory) this.undoStack.shift();
+    this.redoStack = [];
+  }
+
+  undo() {
+    const el = this.editingId ? document.getElementById('e-content') : document.getElementById('c-content');
+    if (!el || this.undoStack.length === 0) return;
+    this.redoStack.push(el.innerHTML);
+    el.innerHTML = this.undoStack.pop();
+  }
+
+  redo() {
+    const el = this.editingId ? document.getElementById('e-content') : document.getElementById('c-content');
+    if (!el || this.redoStack.length === 0) return;
+    this.undoStack.push(el.innerHTML);
+    el.innerHTML = this.redoStack.pop();
+  }
+
+  bindEvents() {
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('sidebar-backdrop');
+    
+    document.getElementById('sidebar-toggle').onclick = () => {
+      sidebar.classList.toggle('-translate-x-full');
+      backdrop.classList.toggle('hidden');
+    };
+    backdrop.onclick = () => {
+      sidebar.classList.add('-translate-x-full');
+      backdrop.classList.add('hidden');
+    };
+
+    document.getElementById('theme-toggle').onclick = () => {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('mbnotes-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    };
+
+    let t;
+    document.getElementById('search').oninput = e => {
+      clearTimeout(t);
+      t = setTimeout(() => {
+        this.query = e.target.value.trim().toLowerCase();
+        this.render();
+      }, 150);
+    };
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.onclick = () => {
+        this.filter = btn.dataset.filter;
+        this.tagFilter = null;
+        document.querySelectorAll('.nav-btn').forEach(b => {
+          b.classList.remove('active', 'bg-amber-50', 'text-amber-700');
+          b.classList.add('text-gray-600');
+        });
+        btn.classList.add('active', 'bg-amber-50', 'text-amber-700');
+        btn.classList.remove('text-gray-600');
+        this.render();
+      };
+    });
+
+    document.getElementById('c-content').onfocus = () => this.expandCapture();
+    
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        if (this.editingId) this.updateNote();
+        else this.saveNote();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        e.preventDefault();
+        this.undo();
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.shiftKey && e.key === 'Z'))) {
+        e.preventDefault();
+        this.redo();
+      }
+    });
+
+    document.querySelectorAll('.format-btn').forEach(btn => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        document.execCommand(btn.dataset.cmd, false, null);
+      };
+    });
+
+    document.querySelectorAll('.color-btn').forEach(btn => {
+      btn.onclick = () => {
+        this.captureColor = btn.dataset.color;
+        this.captureDark = btn.dataset.dark;
+        document.getElementById('capture').className = `max-w-2xl mx-auto mb-8 rounded-2xl border shadow-sm transition-all ${this.captureColor}`;
+      };
+    });
+    document.querySelectorAll('.ecolor-btn').forEach(btn => {
+      btn.onclick = () => {
+        this.editColor = btn.dataset.ecolor;
+        this.editDark = btn.dataset.edark;
+        document.getElementById('modal-card').className = `rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl ${this.editColor}`;
+      };
+    });
+
+    document.getElementById('toggle-checklist').onclick = () => {
+      this.captureChecklist = !this.captureChecklist;
+      document.getElementById('c-checklist').classList.toggle('hidden', !this.captureChecklist);
+      if (this.captureChecklist && this.captureItems.length === 0) {
+        this.captureItems = [{ text: '', completed: false }];
+        this.renderCaptureChecklist();
+      }
+    };
+
+    document.getElementById('e-toggle-checklist').onclick = () => {
+      if (this.editItems.length > 0) {
+        const text = this.editItems.map(i => (i.completed ? '☑ ' : '☐ ') + i.text).join('<br>');
+        document.getElementById('e-content').innerHTML += (document.getElementById('e-content').innerHTML ? '<br><br>' : '') + text;
+        this.editItems = [];
+        document.getElementById('e-checklist').classList.add('hidden');
+      } else {
+        this.editItems = [{ text: '', completed: false }];
+        document.getElementById('e-checklist').classList.remove('hidden');
+        this.renderEditChecklist();
+      }
+    };
+
+    document.getElementById('share-btn').onclick = () => this.shareNote();
+    document.getElementById('modal').onclick = e => { if (e.target.id === 'modal') this.closeModal(); };
+
+    ['c-content', 'e-content'].forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener('input', () => this.saveState(el.innerHTML));
+    });
+  }
+
+  expandCapture() {
+    document.getElementById('c-title').classList.remove('hidden');
+    document.getElementById('c-controls').classList.remove('hidden');
+    document.getElementById('c-format-bar').classList.remove('hidden');
+    document.getElementById('capture').classList.add('ring-2', 'ring-amber-400/40');
+  }
+
+  closeCapture() {
+    document.getElementById('c-title').value = '';
+    document.getElementById('c-content').innerHTML = '';
+    document.getElementById('c-title').classList.add('hidden');
+    document.getElementById('c-controls').classList.add('hidden');
+    document.getElementById('c-format-bar').classList.add('hidden');
+    document.getElementById('c-checklist').classList.add('hidden');
+    document.getElementById('c-attachments').classList.add('hidden');
+    document.getElementById('capture').className = 'max-w-2xl mx-auto mb-8 bg-white rounded-2xl border shadow-sm transition-all';
+    this.captureColor = 'bg-white';
+    this.captureDark = 'note-white';
+    this.captureChecklist = false;
+    this.captureItems = [];
+    this.captureAttachments = [];
+    this.undoStack = [];
+    this.redoStack = [];
+  }
+
+  // ... (the rest of the methods stay exactly the same as previous version)
+  // For brevity I'm keeping the structure — all other methods (saveNote, openNote, render, etc.)
+  // remain identical to the last working version.
+
+  async handleFiles(event, mode) {
+    for (const file of Array.from(event.target.files)) {
+      if (file.size > 4 * 1024 * 1024) {
+        alert(`"${file.name}" is larger than 4 MB and was skipped.`);
+        continue;
+      }
+      const dataUrl = await new Promise(r => {
+        const reader = new FileReader();
+        reader.onload = e => r(e.target.result);
+        reader.readAsDataURL(file);
+      });
+      const att = { id: crypto.randomUUID(), name: file.name, type: file.type, size: file.size, data: dataUrl };
+      if (mode === 'capture') {
+        this.captureAttachments.push(att);
+        this.renderCaptureAttachments();
+      } else {
+        this.editAttachments.push(att);
+        this.renderEditAttachments();
+      }
+    }
+    event.target.value = '';
+  }
+
+  renderCaptureAttachments() {
+    const el = document.getElementById('c-attachments');
+    if (!this.captureAttachments.length) { el.classList.add('hidden'); return; }
+    el.classList.remove('hidden');
+    el.innerHTML = this.captureAttachments.map((a, i) => this.attachmentChip(a, i, 'capture')).join('');
+  }
+
+  renderEditAttachments() {
+    document.getElementById('e-attachments').innerHTML = 
+      this.editAttachments.map((a, i) => this.attachmentChip(a, i, 'edit')).join('');
+  }
+
+  attachmentChip(a, i, mode) {
+    const isImage = a.type.startsWith('image/');
+    return `<div class="attachment-chip flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs">
+      ${isImage ? `<img src="${a.data}" class="w-10 h-10 object-cover rounded">` : `<i class="fa-solid fa-file"></i>`}
+      <span class="max-w-[120px] truncate">${this.escape(a.name)}</span>
+      <button onclick="app.removeAttachment(${i}, '${mode}')" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+    </div>`;
+  }
+
+  removeAttachment(i, mode) {
+    if (mode === 'capture') {
+      this.captureAttachments.splice(i, 1);
+      this.renderCaptureAttachments();
+    } else {
+      this.editAttachments.splice(i, 1);
+      this.renderEditAttachments();
+    }
+  }
+
+  renderCaptureChecklist() {
+    const el = document.getElementById('c-checklist');
+    el.innerHTML = this.captureItems.map((item, i) => `
+      <div class="flex items-center gap-2">
+        <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="app.captureItems[${i}].completed = this.checked">
+        <input type="text" value="${this.escape(item.text)}" placeholder="List item" class="flex-1 text-sm bg-transparent outline-none" oninput="app.captureItems[${i}].text = this.value">
+        <button onclick="app.captureItems.splice(${i},1); app.renderCaptureChecklist()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+      </div>`).join('') + 
+      `<button onclick="app.captureItems.push({text:'',completed:false}); app.renderCaptureChecklist()" class="text-xs text-amber-600 font-medium mt-1">+ Add item</button>`;
+  }
+
+  renderEditChecklist() {
+    const el = document.getElementById('e-checklist');
+    el.innerHTML = this.editItems.map((item, i) => `
+      <div class="flex items-center gap-2">
+        <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="app.editItems[${i}].completed = this.checked; app.renderEditChecklist()">
+        <input type="text" value="${this.escape(item.text)}" class="flex-1 text-sm outline-none" oninput="app.editItems[${i}].text = this.value">
+        <button onclick="app.editItems.splice(${i},1); app.renderEditChecklist()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+      </div>`).join('') + 
+      `<button onclick="app.editItems.push({text:'',completed:false}); app.renderEditChecklist()" class="text-xs text-amber-600 font-medium">+ Add item</button>`;
+  }
+
+  extractTags(text) {
+    return [...text.matchAll(/#([a-zA-Z0-9_-]+)/g)].map(m => m[1].toLowerCase());
+  }
+
+  async saveNote() {
+    const title = document.getElementById('c-title').value.trim();
+    const content = document.getElementById('c-content').innerHTML.trim();
+    const items = this.captureItems.filter(i => i.text.trim());
+    if (!title && !content && items.length === 0 && this.captureAttachments.length === 0) return;
+
+    const note = {
+      id: crypto.randomUUID(),
+      title: title || (content.replace(/<[^>]+>/g, '').slice(0, 48) || 'Untitled'),
+      content,
+      color: this.captureColor,
+      darkClass: this.captureDark,
+      pinned: false,
+      isChecklist: items.length > 0,
+      checklistItems: items,
+      attachments: [...this.captureAttachments],
+      tags: this.extractTags(title + ' ' + content.replace(/<[^>]+>/g, '')),
+      archived: false,
+      trashed: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    this.notes.unshift(note);
+    await this.persist();
+    this.closeCapture();
+    this.render();
+  }
+
+  async openNote(id) {
+    const note = this.notes.find(n => n.id === id);
+    if (!note) return;
+    this.editingId = id;
+    this.editColor = note.color || 'bg-white';
+    this.editDark = note.darkClass || 'note-white';
+    this.editItems = JSON.parse(JSON.stringify(note.checklistItems || []));
+    this.editAttachments = JSON.parse(JSON.stringify(note.attachments || []));
+    this.undoStack = [];
+    this.redoStack = [];
+
+    document.getElementById('e-title').value = note.title;
+    document.getElementById('e-content').innerHTML = note.content || '';
+    document.getElementById('modal-card').className = `rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl ${this.editColor}`;
+
+    const cl = document.getElementById('e-checklist');
+    if (note.isChecklist || this.editItems.length) {
+      cl.classList.remove('hidden');
+      this.renderEditChecklist();
+    } else cl.classList.add('hidden');
+
+    this.renderEditAttachments();
+
+    const backlinks = this.notes.filter(n => n.id !== id && !n.trashed && (n.content || '').includes(`[[${note.title}]]`));
+    const bl = document.getElementById('backlinks');
+    if (backlinks.length) {
+      bl.classList.remove('hidden');
+      document.getElementById('backlinks-list').innerHTML = backlinks.map(b => 
+        `<button onclick="app.openNote('${b.id}')" class="text-xs bg-amber-100 text-amber-800 px-2.5 py-1 rounded-lg">${this.escape(b.title)}</button>`
+      ).join('');
+    } else bl.classList.add('hidden');
+
+    document.getElementById('modal').classList.remove('hidden');
+    document.getElementById('e-title').focus();
+  }
+
+  async updateNote() {
+    const note = this.notes.find(n => n.id === this.editingId);
+    if (!note) return;
+    note.title = document.getElementById('e-title').value.trim() || 'Untitled';
+    note.content = document.getElementById('e-content').innerHTML.trim();
+    note.color = this.editColor;
+    note.darkClass = this.editDark;
+    note.checklistItems = this.editItems.filter(i => i.text.trim());
+    note.isChecklist = note.checklistItems.length > 0;
+    note.attachments = [...this.editAttachments];
+    note.tags = this.extractTags(note.title + ' ' + note.content.replace(/<[^>]+>/g, ''));
+    note.updatedAt = new Date().toISOString();
+    await this.persist();
+    this.closeModal();
+    this.render();
+  }
+
+  closeModal() {
+    this.editingId = null;
+    document.getElementById('modal').classList.add('hidden');
+    this.undoStack = [];
+    this.redoStack = [];
+  }
+
+  async shareNote() {
+    const note = this.notes.find(n => n.id === this.editingId);
+    if (!note) return;
+    const text = `${note.title}\n\n${note.content.replace(/<[^>]+>/g, '')}`;
+    if (navigator.share) {
+      try { await navigator.share({ title: note.title, text }); } catch {}
+    } else {
+      await navigator.clipboard.writeText(text);
+      alert('Note copied to clipboard');
+    }
+  }
+
+  async toggle(id, field) {
+    const note = this.notes.find(n => n.id === id);
+    if (!note) return;
+    note[field] = !note[field];
+    note.updatedAt = new Date().toISOString();
+    await this.persist();
+    this.render();
+  }
+
+  async deletePermanent(id) {
+    if (!confirm('Delete this note permanently?')) return;
+    this.notes = this.notes.filter(n => n.id !== id);
+    await this.persist();
+    this.render();
+  }
+
+  async toggleCheckItem(noteId, idx) {
+    const note = this.notes.find(n => n.id === noteId);
+    if (!note?.checklistItems?.[idx]) return;
+    note.checklistItems[idx].completed = !note.checklistItems[idx].completed;
+    note.updatedAt = new Date().toISOString();
+    await this.persist();
+    this.render();
+  }
+
+  formatContent(html) {
+    return (html || '').replace(/\[\[([^\]]+)\]\]/g, (_, title) => {
+      const target = this.notes.find(n => n.title === title && !n.trashed);
+      return target
+        ? `<span class="note-link" onclick="event.stopPropagation(); app.openNote('${target.id}')">${title}</span>`
+        : `<span class="note-link opacity-60">[[${title}]]</span>`;
+    });
+  }
+
+  escape(str) {
+    return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  timeAgo(iso) {
+    try {
+      const diff = (Date.now() - new Date(iso).getTime()) / 1000;
+      if (diff < 60) return 'just now';
+      if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+      if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+      if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+      return new Date(iso).toLocaleDateString();
+    } catch { return ''; }
+  }
+
+  render() {
+    const tagCount = {};
+    this.notes.forEach(n => {
+      if (!n.trashed && n.tags) n.tags.forEach(t => tagCount[t] = (tagCount[t] || 0) + 1);
+    });
+    document.getElementById('tag-list').innerHTML = Object.entries(tagCount)
+      .sort((a, b) => b[1] - a[1])
+      .map(([tag, count]) => `
+        <button onclick="app.tagFilter='${tag}'; app.filter='tag'; app.render()"
+                class="w-full flex justify-between items-center px-3 py-2 rounded-lg text-xs font-medium
+                       ${this.tagFilter === tag ? 'bg-amber-50 text-amber-700' : 'text-gray-600 hover:bg-gray-100'}">
+          <span>#${tag}</span>
+          <span class="text-gray-400 bg-gray-100 px-1.5 rounded-full text-[10px]">${count}</span>
+        </button>`).join('');
+
+    let list = this.notes.filter(n => {
+      if (this.filter === 'trash') return n.trashed;
+      if (n.trashed) return false;
+      if (this.filter === 'archive') return n.archived;
+      if (n.archived) return false;
+      if (this.filter === 'pinned') return n.pinned;
+      if (this.filter === 'checklist') return n.isChecklist;
+      if (this.filter === 'tag') return n.tags?.includes(this.tagFilter);
+      return true;
+    });
+
+    if (this.query) {
+      list = list.filter(n =>
+        n.title.toLowerCase().includes(this.query) ||
+        (n.content || '').replace(/<[^>]+>/g, '').toLowerCase().includes(this.query) ||
+        n.tags?.some(t => t.includes(this.query))
+      );
+    }
+
+    list.sort((a, b) => {
+      if (a.pinned !== b.pinned) return b.pinned - a.pinned;
+      return new Date(b.updatedAt) - new Date(a.updatedAt);
+    });
+
+    const container = document.getElementById('notes');
+    const empty = document.getElementById('empty');
+
+    if (list.length === 0) {
+      container.innerHTML = '';
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+
+    container.innerHTML = list.map(note => {
+      const done = note.checklistItems?.filter(i => i.completed).length || 0;
+      const total = note.checklistItems?.length || 0;
+      const darkCls = note.darkClass || this.colorToDark(note.color);
+
+      return `
+        <div class="masonry-item note-card ${note.color || 'bg-white'} ${darkCls} rounded-2xl p-4 border border-gray-200/80 shadow-sm hover:shadow-md transition cursor-pointer relative group"
+             onclick="app.openNote('${note.id}')">
+          <div class="note-actions absolute top-2.5 right-2.5 flex gap-0.5 rounded-lg px-1 py-0.5">
+            ${!note.trashed ? `
+              <button onclick="event.stopPropagation(); app.toggle('${note.id}','pinned')" class="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-amber-600 rounded-md">
+                <i class="fa-solid fa-thumbtack text-xs ${note.pinned ? 'text-amber-600' : ''}"></i>
+              </button>
+              <button onclick="event.stopPropagation(); app.toggle('${note.id}','archived')" class="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-800 rounded-md">
+                <i class="fa-solid fa-box-archive text-xs"></i>
+              </button>
+              <button onclick="event.stopPropagation(); app.toggle('${note.id}','trashed')" class="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-red-600 rounded-md">
+                <i class="fa-solid fa-trash text-xs"></i>
+              </button>
+            ` : `
+              <button onclick="event.stopPropagation(); app.toggle('${note.id}','trashed')" class="w-7 h-7 flex items-center justify-center text-green-600 rounded-md">
+                <i class="fa-solid fa-rotate-left text-xs"></i>
+              </button>
+              <button onclick="event.stopPropagation(); app.deletePermanent('${note.id}')" class="w-7 h-7 flex items-center justify-center text-red-600 rounded-md">
+                <i class="fa-solid fa-trash-can text-xs"></i>
+              </button>
+            `}
+          </div>
+
+          <h3 class="font-semibold pr-16 mb-1">${this.escape(note.title)}</h3>
+          <div class="text-sm leading-relaxed mb-3 opacity-90">${this.formatContent(note.content)}</div>
+
+          ${note.attachments?.length ? `
+            <div class="flex flex-wrap gap-2 mb-3">
+              ${note.attachments.slice(0, 3).map(a => a.type.startsWith('image/') 
+                ? `<img src="${a.data}" class="w-14 h-14 object-cover rounded-lg border">`
+                : `<div class="attachment-chip flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg"><i class="fa-solid fa-file"></i>${this.escape(a.name.slice(0,12))}</div>`
+              ).join('')}
+            </div>
+          ` : ''}
+
+          ${total > 0 ? `
+            <div class="space-y-1 mb-3 pt-2 border-t border-black/5 dark:border-white/10">
+              <div class="text-[11px] opacity-60 mb-1">${done}/${total} done</div>
+              ${note.checklistItems.map((item, i) => `
+                <label class="flex items-center gap-2 text-xs cursor-pointer" onclick="event.stopPropagation()">
+                  <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="app.toggleCheckItem('${note.id}', ${i})">
+                  <span class="${item.completed ? 'line-through opacity-50' : ''}">${this.escape(item.text)}</span>
+                </label>
+              `).join('')}
+            </div>
+          ` : ''}
+
+          <div class="flex flex-wrap items-center gap-1.5 mt-2">
+            ${note.tags?.map(t => `<span class="text-[11px] font-medium bg-black/5 dark:bg-white/10 px-2 py-0.5 rounded-md">#${t}</span>`).join('') || ''}
+            <span class="text-[11px] opacity-50 ml-auto">${this.timeAgo(note.updatedAt)}</span>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  exportJSON() {
+    const data = JSON.stringify(this.notes, null, 2);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([data], { type: 'application/json' }));
+    a.download = `mbnotes-backup-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+  }
+
+  async importJSON(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const data = JSON.parse(await file.text());
+      if (!Array.isArray(data)) throw new Error();
+      if (!confirm(`Import ${data.length} notes? This replaces your current notes.`)) return;
+      this.notes = data;
+      await this.persist();
+      this.render();
+    } catch {
+      alert('Could not read that file.');
+    }
+    e.target.value = '';
+  }
+}
+
+const app = new MBNotes();
+</script>
+</body>
+</html>
