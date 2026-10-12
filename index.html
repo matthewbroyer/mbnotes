@@ -7,7 +7,7 @@
   <meta name="description" content="mbnotes.online – fast local-first notes">
   <title>mbnotes.online</title>
   
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23d97706'/><text y='.9em' font-size='70' x='12' fill='white' font-family='system-ui'>🗒️</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23d97706'/><text y='.9em' font-size='70' x='12' fill='white' font-family='system-ui'>MB</text></svg>">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -21,24 +21,49 @@
     .masonry-item { break-inside: avoid; margin-bottom: 1rem; }
 
     .note-link {
-      display: inline; padding: 0.1em 0.4em; margin: 0 0.05em;
-      border-radius: 0.3em; font-weight: 500; font-size: 0.92em; cursor: pointer;
-      background: #fef3c7; color: #b45309; border: 1px solid #fcd34d;
+      display: inline;
+      padding: 0.1em 0.4em;
+      margin: 0 0.05em;
+      border-radius: 0.3em;
+      font-weight: 500;
+      font-size: 0.92em;
+      cursor: pointer;
+      background: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fcd34d;
     }
     .note-link:hover { background: #fde68a; }
 
     .note-actions {
-      opacity: 0; transform: scale(0.95); transition: opacity 0.15s, transform 0.15s;
-      background: #ffffff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      opacity: 0;
+      transform: scale(0.95);
+      transition: opacity 0.15s, transform 0.15s;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
-    .note-card:hover .note-actions, .note-card:focus-within .note-actions {
-      opacity: 1; transform: scale(1);
+    .note-card:hover .note-actions,
+    .note-card:focus-within .note-actions {
+      opacity: 1;
+      transform: scale(1);
     }
-    .dark .note-actions { background: #1e293b; border-color: #334155; }
+    .dark .note-actions {
+      background: #1e293b;
+      border-color: #334155;
+    }
 
-    .attachment-chip { background: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
-    .dark .attachment-chip { background: #334155; color: #e2e8f0; border-color: #475569; }
+    .attachment-chip {
+      background: #f3f4f6;
+      color: #374151;
+      border: 1px solid #e5e7eb;
+    }
+    .dark .attachment-chip {
+      background: #334155;
+      color: #e2e8f0;
+      border-color: #475569;
+    }
 
+    /* ===== Dark mode base ===== */
     .dark body, .dark { background: #0f172a; color: #e2e8f0; }
     .dark .bg-white { background: #1e293b !important; }
     .dark .bg-gray-50 { background: #0f172a !important; }
@@ -49,43 +74,109 @@
     .dark .text-gray-600 { color: #94a3b8 !important; }
     .dark .text-gray-500, .dark .text-gray-400 { color: #64748b !important; }
 
-    .dark input, .dark textarea, .dark [contenteditable] {
-      background: #1e293b !important; color: #f1f5f9 !important; border-color: #334155 !important;
+    /* Dark mode form elements - only when NOT inside a colored note */
+    .dark input:not(.note-input),
+    .dark textarea:not(.note-input),
+    .dark [contenteditable]:not(.note-content) {
+      background: #1e293b !important;
+      color: #f1f5f9 !important;
+      border-color: #334155 !important;
     }
-    .dark input::placeholder, .dark textarea::placeholder { color: #64748b !important; }
+    .dark input::placeholder,
+    .dark textarea::placeholder {
+      color: #64748b !important;
+    }
 
-    .dark .note-amber { background: #78350f !important; color: #fef3c7 !important; }
-    .dark .note-emerald { background: #064e3b !important; color: #d1fae5 !important; }
-    .dark .note-sky { background: #0c4a6e !important; color: #e0f2fe !important; }
-    .dark .note-purple { background: #4c1d95 !important; color: #ede9fe !important; }
-    .dark .note-rose { background: #9f1239 !important; color: #ffe4e6 !important; }
-    .dark .note-white { background: #1e293b !important; }
+    /* ===== Colored notes in DARK mode (cards + modal) ===== */
+    .dark .note-amber {
+      background: #78350f !important;
+      color: #fef3c7 !important;
+    }
+    .dark .note-emerald {
+      background: #064e3b !important;
+      color: #d1fae5 !important;
+    }
+    .dark .note-sky {
+      background: #0c4a6e !important;
+      color: #e0f2fe !important;
+    }
+    .dark .note-purple {
+      background: #4c1d95 !important;
+      color: #ede9fe !important;
+    }
+    .dark .note-rose {
+      background: #9f1239 !important;
+      color: #ffe4e6 !important;
+    }
+    .dark .note-white {
+      background: #1e293b !important;
+      color: #e2e8f0 !important;
+    }
 
-    .dark .note-link { background: #92400e; color: #fde68a; border-color: #b45309; }
+    /* Make inputs/content inside colored notes inherit properly */
+    .dark .note-amber input,
+    .dark .note-amber [contenteditable],
+    .dark .note-emerald input,
+    .dark .note-emerald [contenteditable],
+    .dark .note-sky input,
+    .dark .note-sky [contenteditable],
+    .dark .note-purple input,
+    .dark .note-purple [contenteditable],
+    .dark .note-rose input,
+    .dark .note-rose [contenteditable] {
+      background: transparent !important;
+      color: inherit !important;
+    }
 
+    .dark .note-link {
+      background: #92400e;
+      color: #fde68a;
+      border-color: #b45309;
+    }
+
+    /* Theme switch */
     .theme-switch {
-      position: relative; width: 44px; height: 24px; background: #d1d5db;
-      border-radius: 9999px; cursor: pointer; transition: background 0.2s;
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #d1d5db;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: background 0.2s;
     }
     .theme-switch::after {
-      content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px;
-      background: white; border-radius: 50%; transition: transform 0.2s;
+      content: '';
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 20px; height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s;
       box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
     .dark .theme-switch { background: #f59e0b; }
     .dark .theme-switch::after { transform: translateX(20px); }
 
-    [contenteditable] { min-height: 60px; outline: none; line-height: 1.5; }
+    [contenteditable] {
+      min-height: 60px;
+      outline: none;
+      line-height: 1.5;
+    }
     [contenteditable]:empty:before {
-      content: attr(data-placeholder); color: #9ca3af; pointer-events: none;
+      content: attr(data-placeholder);
+      color: #9ca3af;
+      pointer-events: none;
     }
     .dark [contenteditable]:empty:before { color: #64748b; }
 
-    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
+  <!-- Header -->
   <header class="bg-white border-b sticky top-0 z-40 px-3 py-2.5 flex items-center gap-3 shadow-sm">
     <button id="sidebar-toggle" class="md:hidden p-2.5 text-gray-500 hover:bg-gray-100 rounded-lg">
       <i class="fa-solid fa-bars"></i>
@@ -147,6 +238,7 @@
     <div id="sidebar-backdrop" class="fixed inset-0 bg-black/40 z-20 hidden md:hidden"></div>
 
     <main class="flex-1 overflow-y-auto p-4 md:p-6">
+      <!-- Capture -->
       <div id="capture" class="max-w-2xl mx-auto mb-8 bg-white rounded-2xl border shadow-sm transition-all">
         <div class="p-4">
           <input id="c-title" placeholder="Title (optional)" class="w-full font-semibold text-gray-900 placeholder-gray-400 outline-none mb-2 hidden">
@@ -198,7 +290,7 @@
           <div class="text-5xl mb-4 opacity-40"><i class="fa-solid fa-pen-to-square"></i></div>
           <p class="font-medium text-gray-600">No notes yet</p>
           <p class="text-sm mt-2 max-w-xs mx-auto">Type above and press Ctrl + Enter to save.</p>
-          <button onclick="app.seedDemoNotes()" class="mt-6 px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-xl transition">
+          <button onclick="app.seedDemoNotes()" class="mt-6 px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-xl">
             Load demo notes
           </button>
         </div>
@@ -210,31 +302,31 @@
   <div id="modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
     <div id="modal-card" class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
       <div class="p-5">
-        <input id="e-title" class="w-full font-bold text-lg outline-none border-b pb-2 mb-3" placeholder="Title">
+        <input id="e-title" class="note-input w-full font-bold text-lg outline-none border-b pb-2 mb-3 bg-transparent" placeholder="Title">
         
-        <div class="flex items-center gap-1 mb-2 pb-2 border-b border-gray-100">
-          <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="bold" title="Bold"><i class="fa-solid fa-bold text-sm"></i></button>
-          <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="italic" title="Italic"><i class="fa-solid fa-italic text-sm"></i></button>
-          <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="underline" title="Underline"><i class="fa-solid fa-underline text-sm"></i></button>
-          <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="strikeThrough" title="Strikethrough"><i class="fa-solid fa-strikethrough text-sm"></i></button>
-          <div class="w-px h-4 bg-gray-200 mx-1"></div>
-          <button onclick="app.undo()" class="p-1.5 rounded hover:bg-gray-100" title="Undo"><i class="fa-solid fa-rotate-left text-sm"></i></button>
-          <button onclick="app.redo()" class="p-1.5 rounded hover:bg-gray-100" title="Redo"><i class="fa-solid fa-rotate-right text-sm"></i></button>
+        <div class="flex items-center gap-1 mb-2 pb-2 border-b border-black/10">
+          <button class="format-btn p-1.5 rounded hover:bg-black/5" data-cmd="bold" title="Bold"><i class="fa-solid fa-bold text-sm"></i></button>
+          <button class="format-btn p-1.5 rounded hover:bg-black/5" data-cmd="italic" title="Italic"><i class="fa-solid fa-italic text-sm"></i></button>
+          <button class="format-btn p-1.5 rounded hover:bg-black/5" data-cmd="underline" title="Underline"><i class="fa-solid fa-underline text-sm"></i></button>
+          <button class="format-btn p-1.5 rounded hover:bg-black/5" data-cmd="strikeThrough" title="Strikethrough"><i class="fa-solid fa-strikethrough text-sm"></i></button>
+          <div class="w-px h-4 bg-black/20 mx-1"></div>
+          <button onclick="app.undo()" class="p-1.5 rounded hover:bg-black/5" title="Undo"><i class="fa-solid fa-rotate-left text-sm"></i></button>
+          <button onclick="app.redo()" class="p-1.5 rounded hover:bg-black/5" title="Redo"><i class="fa-solid fa-rotate-right text-sm"></i></button>
         </div>
 
         <div id="e-content" contenteditable="true" 
-             class="w-full text-sm outline-none min-h-[100px] mb-3"
+             class="note-content w-full text-sm outline-none min-h-[100px] mb-3 bg-transparent"
              data-placeholder="Write something…"></div>
         
         <div id="e-attachments" class="flex flex-wrap gap-2 mb-3"></div>
         <div id="e-checklist" class="space-y-1.5 mb-4 hidden"></div>
 
-        <div id="backlinks" class="hidden mb-4 pt-3 border-t">
-          <p class="text-xs font-semibold text-gray-400 uppercase mb-2">Linked from</p>
+        <div id="backlinks" class="hidden mb-4 pt-3 border-t border-black/10">
+          <p class="text-xs font-semibold opacity-60 uppercase mb-2">Linked from</p>
           <div id="backlinks-list" class="flex flex-wrap gap-1.5"></div>
         </div>
 
-        <div class="flex items-center justify-between pt-3 border-t gap-2 flex-wrap">
+        <div class="flex items-center justify-between pt-3 border-t border-black/10 gap-2 flex-wrap">
           <div class="flex items-center gap-1">
             <div class="flex gap-1.5">
               <button data-ecolor="bg-white" data-edark="note-white" class="ecolor-btn w-6 h-6 rounded-full bg-white border border-gray-300"></button>
@@ -244,15 +336,15 @@
               <button data-ecolor="bg-purple-100" data-edark="note-purple" class="ecolor-btn w-6 h-6 rounded-full bg-purple-200 border border-purple-300"></button>
               <button data-ecolor="bg-rose-100" data-edark="note-rose" class="ecolor-btn w-6 h-6 rounded-full bg-rose-200 border border-rose-300"></button>
             </div>
-            <button id="e-toggle-checklist" class="p-2 text-gray-600 hover:bg-gray-200 rounded-lg" title="Convert to checklist"><i class="fa-solid fa-square-check"></i></button>
-            <label class="p-2 text-gray-600 hover:bg-gray-200 rounded-lg cursor-pointer" title="Attach file">
+            <button id="e-toggle-checklist" class="p-2 opacity-70 hover:opacity-100 rounded-lg" title="Convert to checklist"><i class="fa-solid fa-square-check"></i></button>
+            <label class="p-2 opacity-70 hover:opacity-100 rounded-lg cursor-pointer" title="Attach file">
               <i class="fa-solid fa-paperclip"></i>
               <input type="file" class="hidden" multiple accept="image/*,.pdf,.txt,.md,.doc,.docx,.zip" onchange="app.handleFiles(event, 'edit')">
             </label>
-            <button id="share-btn" class="p-2 text-gray-600 hover:bg-gray-200 rounded-lg" title="Share note"><i class="fa-solid fa-share-nodes"></i></button>
+            <button id="share-btn" class="p-2 opacity-70 hover:opacity-100 rounded-lg" title="Share note"><i class="fa-solid fa-share-nodes"></i></button>
           </div>
           <div class="flex gap-2">
-            <button onclick="app.closeModal()" class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-xl">Cancel</button>
+            <button onclick="app.closeModal()" class="px-4 py-2 text-sm opacity-70 hover:opacity-100 rounded-xl">Cancel</button>
             <button onclick="app.updateNote()" class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-xl">Save changes</button>
           </div>
         </div>
@@ -286,7 +378,6 @@ class MBNotes {
   }
 
   async init() {
-    // Theme
     const savedTheme = localStorage.getItem('mbnotes-theme');
     if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
@@ -296,7 +387,6 @@ class MBNotes {
     this.bindEvents();
     this.render();
 
-    // Seed demo notes on first visit
     const hasVisited = localStorage.getItem('mbnotes_has_visited');
     if (!hasVisited && this.notes.length === 0) {
       this.seedDemoNotes();
@@ -385,11 +475,14 @@ class MBNotes {
     this.render();
   }
 
-  // ========== All other methods (unchanged from your last working version) ==========
   colorToDark(color) {
     return {
-      'bg-white': 'note-white', 'bg-amber-100': 'note-amber', 'bg-emerald-100': 'note-emerald',
-      'bg-sky-100': 'note-sky', 'bg-purple-100': 'note-purple', 'bg-rose-100': 'note-rose'
+      'bg-white': 'note-white',
+      'bg-amber-100': 'note-amber',
+      'bg-emerald-100': 'note-emerald',
+      'bg-sky-100': 'note-sky',
+      'bg-purple-100': 'note-purple',
+      'bg-rose-100': 'note-rose'
     }[color] || 'note-white';
   }
 
@@ -485,11 +578,14 @@ class MBNotes {
         document.getElementById('capture').className = `max-w-2xl mx-auto mb-8 rounded-2xl border shadow-sm transition-all ${this.captureColor}`;
       };
     });
+
     document.querySelectorAll('.ecolor-btn').forEach(btn => {
       btn.onclick = () => {
         this.editColor = btn.dataset.ecolor;
         this.editDark = btn.dataset.edark;
-        document.getElementById('modal-card').className = `rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl ${this.editColor}`;
+        // Apply both light and dark classes
+        document.getElementById('modal-card').className = 
+          `rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl ${this.editColor} ${this.editDark}`;
       };
     });
 
@@ -589,7 +685,7 @@ class MBNotes {
     return `<div class="attachment-chip flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs">
       ${isImage ? `<img src="${a.data}" class="w-10 h-10 object-cover rounded">` : `<i class="fa-solid fa-file"></i>`}
       <span class="max-w-[120px] truncate">${this.escape(a.name)}</span>
-      <button onclick="app.removeAttachment(${i}, '${mode}')" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+      <button onclick="app.removeAttachment(${i}, '${mode}')" class="opacity-60 hover:opacity-100"><i class="fa-solid fa-xmark"></i></button>
     </div>`;
   }
 
@@ -609,7 +705,7 @@ class MBNotes {
       <div class="flex items-center gap-2">
         <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="app.captureItems[${i}].completed = this.checked">
         <input type="text" value="${this.escape(item.text)}" placeholder="List item" class="flex-1 text-sm bg-transparent outline-none" oninput="app.captureItems[${i}].text = this.value">
-        <button onclick="app.captureItems.splice(${i},1); app.renderCaptureChecklist()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+        <button onclick="app.captureItems.splice(${i},1); app.renderCaptureChecklist()" class="opacity-60 hover:opacity-100"><i class="fa-solid fa-xmark"></i></button>
       </div>`).join('') + 
       `<button onclick="app.captureItems.push({text:'',completed:false}); app.renderCaptureChecklist()" class="text-xs text-amber-600 font-medium mt-1">+ Add item</button>`;
   }
@@ -619,8 +715,8 @@ class MBNotes {
     el.innerHTML = this.editItems.map((item, i) => `
       <div class="flex items-center gap-2">
         <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="app.editItems[${i}].completed = this.checked; app.renderEditChecklist()">
-        <input type="text" value="${this.escape(item.text)}" class="flex-1 text-sm outline-none" oninput="app.editItems[${i}].text = this.value">
-        <button onclick="app.editItems.splice(${i},1); app.renderEditChecklist()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+        <input type="text" value="${this.escape(item.text)}" class="flex-1 text-sm bg-transparent outline-none" oninput="app.editItems[${i}].text = this.value">
+        <button onclick="app.editItems.splice(${i},1); app.renderEditChecklist()" class="opacity-60 hover:opacity-100"><i class="fa-solid fa-xmark"></i></button>
       </div>`).join('') + 
       `<button onclick="app.editItems.push({text:'',completed:false}); app.renderEditChecklist()" class="text-xs text-amber-600 font-medium">+ Add item</button>`;
   }
@@ -670,7 +766,10 @@ class MBNotes {
 
     document.getElementById('e-title').value = note.title;
     document.getElementById('e-content').innerHTML = note.content || '';
-    document.getElementById('modal-card').className = `rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl ${this.editColor}`;
+    
+    // Apply both light color + dark mode class
+    document.getElementById('modal-card').className = 
+      `rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl ${this.editColor} ${this.editDark}`;
 
     const cl = document.getElementById('e-checklist');
     if (note.isChecklist || this.editItems.length) {
@@ -685,7 +784,7 @@ class MBNotes {
     if (backlinks.length) {
       bl.classList.remove('hidden');
       document.getElementById('backlinks-list').innerHTML = backlinks.map(b => 
-        `<button onclick="app.openNote('${b.id}')" class="text-xs bg-amber-100 text-amber-800 px-2.5 py-1 rounded-lg">${this.escape(b.title)}</button>`
+        `<button onclick="app.openNote('${b.id}')" class="text-xs bg-black/10 px-2.5 py-1 rounded-lg">${this.escape(b.title)}</button>`
       ).join('');
     } else bl.classList.add('hidden');
 
@@ -869,7 +968,7 @@ class MBNotes {
           ` : ''}
 
           ${total > 0 ? `
-            <div class="space-y-1 mb-3 pt-2 border-t border-black/5 dark:border-white/10">
+            <div class="space-y-1 mb-3 pt-2 border-t border-black/10">
               <div class="text-[11px] opacity-60 mb-1">${done}/${total} done</div>
               ${note.checklistItems.map((item, i) => `
                 <label class="flex items-center gap-2 text-xs cursor-pointer" onclick="event.stopPropagation()">
@@ -881,7 +980,7 @@ class MBNotes {
           ` : ''}
 
           <div class="flex flex-wrap items-center gap-1.5 mt-2">
-            ${note.tags?.map(t => `<span class="text-[11px] font-medium bg-black/5 dark:bg-white/10 px-2 py-0.5 rounded-md">#${t}</span>`).join('') || ''}
+            ${note.tags?.map(t => `<span class="text-[11px] font-medium bg-black/10 px-2 py-0.5 rounded-md">#${t}</span>`).join('') || ''}
             <span class="text-[11px] opacity-50 ml-auto">${this.timeAgo(note.updatedAt)}</span>
           </div>
         </div>`;
