@@ -75,6 +75,7 @@
       border-color: #475569;
     }
 
+    /* ===== Dark mode base ===== */
     .dark body, .dark { background: #0f172a; color: #e2e8f0; }
     .dark .bg-white { background: #1e293b !important; }
     .dark .bg-gray-50 { background: #0f172a !important; }
@@ -97,6 +98,7 @@
       color: #64748b !important;
     }
 
+    /* Colored notes in dark mode – force text color on everything inside */
     .dark .note-amber { background: #78350f !important; color: #fef3c7 !important; }
     .dark .note-emerald { background: #064e3b !important; color: #d1fae5 !important; }
     .dark .note-sky { background: #0c4a6e !important; color: #e0f2fe !important; }
@@ -104,11 +106,27 @@
     .dark .note-rose { background: #9f1239 !important; color: #ffe4e6 !important; }
     .dark .note-white { background: #1e293b !important; color: #e2e8f0 !important; }
 
-    .dark .note-amber input, .dark .note-amber [contenteditable],
-    .dark .note-emerald input, .dark .note-emerald [contenteditable],
-    .dark .note-sky input, .dark .note-sky [contenteditable],
-    .dark .note-purple input, .dark .note-purple [contenteditable],
-    .dark .note-rose input, .dark .note-rose [contenteditable] {
+    .dark .note-amber *,
+    .dark .note-emerald *,
+    .dark .note-sky *,
+    .dark .note-purple *,
+    .dark .note-rose *,
+    .dark .note-white * {
+      color: inherit !important;
+    }
+
+    .dark .note-amber input,
+    .dark .note-amber [contenteditable],
+    .dark .note-emerald input,
+    .dark .note-emerald [contenteditable],
+    .dark .note-sky input,
+    .dark .note-sky [contenteditable],
+    .dark .note-purple input,
+    .dark .note-purple [contenteditable],
+    .dark .note-rose input,
+    .dark .note-rose [contenteditable],
+    .dark .note-white input,
+    .dark .note-white [contenteditable] {
       background: transparent !important;
       color: inherit !important;
     }
@@ -122,6 +140,25 @@
       background: #0c4a6e;
       color: #7dd3fc;
       border-color: #0284c7;
+    }
+
+    /* Search bar – more visible in both modes */
+    #search {
+      background: #e5e7eb !important; /* light mode: stronger gray */
+      border: 1px solid #d1d5db;
+    }
+    .dark #search {
+      background: #1e293b !important;
+      border: 1px solid #475569;
+      color: #f1f5f9 !important;
+    }
+    #search:focus {
+      background: #ffffff !important;
+      border-color: #f59e0b;
+    }
+    .dark #search:focus {
+      background: #0f172a !important;
+      border-color: #f59e0b;
     }
 
     .theme-switch {
@@ -160,7 +197,7 @@
     }
     .dark [contenteditable]:empty:before { color: #64748b; }
 
-    /* Sticky controls on mobile so buttons never go off-screen */
+    /* Sticky controls on mobile */
     @media (max-width: 640px) {
       #c-controls, .sticky-controls {
         position: sticky;
@@ -205,7 +242,7 @@
     <div class="flex-1 max-w-2xl relative">
       <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></i>
       <input id="search" type="search" placeholder="Search notes…" 
-             class="w-full pl-9 pr-4 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white outline-none">
+             class="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none">
     </div>
 
     <div class="flex items-center gap-3">
@@ -518,6 +555,14 @@ class MBNotes {
     el.innerHTML = this.redoStack.pop();
   }
 
+  // Critical: focus the editor first so execCommand works
+  runFormat(cmd) {
+    const el = this.editingId ? document.getElementById('e-content') : document.getElementById('c-content');
+    if (!el) return;
+    el.focus();
+    document.execCommand(cmd, false, null);
+  }
+
   bindEvents() {
     const sidebar = document.getElementById('sidebar');
     const backdrop = document.getElementById('sidebar-backdrop');
@@ -561,14 +606,6 @@ class MBNotes {
 
     document.getElementById('c-content').onfocus = () => this.expandCapture();
     
-    // Auto-save helpers
-    const scheduleCaptureSave = () => {
-      clearTimeout(this.autoSaveTimer);
-      this.autoSaveTimer = setTimeout(() => {}, 800); // state is kept live; real save on close
-    };
-    document.getElementById('c-content').addEventListener('input', scheduleCaptureSave);
-    document.getElementById('c-title').addEventListener('input', scheduleCaptureSave);
-
     const scheduleEditSave = () => {
       clearTimeout(this.autoSaveTimer);
       this.autoSaveTimer = setTimeout(() => this.autoSaveEdit(), 500);
@@ -595,10 +632,11 @@ class MBNotes {
       }
     });
 
+    // Fixed format buttons – focus editor first
     document.querySelectorAll('.format-btn').forEach(btn => {
       btn.onclick = (e) => {
         e.preventDefault();
-        document.execCommand(btn.dataset.cmd, false, null);
+        this.runFormat(btn.dataset.cmd);
       };
     });
 
@@ -935,12 +973,9 @@ class MBNotes {
     this.render();
   }
 
-  // Linkify both [[note links]] and regular http/https URLs
   formatContent(html) {
     let out = html || '';
 
-    // First protect existing <a> tags if any
-    // Note wiki links
     out = out.replace(/\[\[([^\]]+)\]\]/g, (_, title) => {
       const target = this.notes.find(n => n.title === title && !n.trashed);
       return target
@@ -948,9 +983,7 @@ class MBNotes {
         : `<span class="note-link opacity-60">[[${this.escape(title)}]]</span>`;
     });
 
-    // Regular website URLs (http/https)
     out = out.replace(/(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/g, (url) => {
-      // Avoid double-linking if already inside an <a>
       return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="url-link" onclick="event.stopPropagation()">${this.escape(url)}</a>`;
     });
 
@@ -1078,7 +1111,6 @@ class MBNotes {
     }
     empty.classList.add('hidden');
 
-    // Separate pinned notes into their own section when viewing "All"
     if (this.filter === 'all' && !this.query) {
       const pinned = list.filter(n => n.pinned);
       const others = list.filter(n => !n.pinned);
