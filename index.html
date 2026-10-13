@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#d97706">
+  <meta name="theme-color" content="#f59e0b">
   <meta name="description" content="mbnotes.online – fast local-first notes">
   <title>mbnotes.online</title>
   
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23d97706'/><text y='.9em' font-size='70' x='12' fill='white' font-family='system-ui'>MB</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23f59e0b'/><text y='.9em' font-size='70' x='12' fill='white' font-family='system-ui'>MB</text></svg>">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -20,7 +20,7 @@
     @media (min-width: 1400px) { .masonry { column-count: 4; } }
     .masonry-item { break-inside: avoid; margin-bottom: 1rem; }
 
-    .note-link {
+    .note-link, .url-link {
       display: inline;
       padding: 0.1em 0.4em;
       margin: 0 0.05em;
@@ -28,11 +28,23 @@
       font-weight: 500;
       font-size: 0.92em;
       cursor: pointer;
+      word-break: break-all;
+      overflow-wrap: anywhere;
+      max-width: 100%;
+    }
+    .note-link {
       background: #fef3c7;
       color: #b45309;
       border: 1px solid #fcd34d;
     }
     .note-link:hover { background: #fde68a; }
+    .url-link {
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #7dd3fc;
+      text-decoration: none;
+    }
+    .url-link:hover { background: #bae6fd; }
 
     .note-actions {
       opacity: 0;
@@ -63,7 +75,6 @@
       border-color: #475569;
     }
 
-    /* ===== Dark mode base ===== */
     .dark body, .dark { background: #0f172a; color: #e2e8f0; }
     .dark .bg-white { background: #1e293b !important; }
     .dark .bg-gray-50 { background: #0f172a !important; }
@@ -74,7 +85,6 @@
     .dark .text-gray-600 { color: #94a3b8 !important; }
     .dark .text-gray-500, .dark .text-gray-400 { color: #64748b !important; }
 
-    /* Dark mode form elements - only when NOT inside a colored note */
     .dark input:not(.note-input),
     .dark textarea:not(.note-input),
     .dark [contenteditable]:not(.note-content) {
@@ -87,43 +97,18 @@
       color: #64748b !important;
     }
 
-    /* ===== Colored notes in DARK mode (cards + modal) ===== */
-    .dark .note-amber {
-      background: #78350f !important;
-      color: #fef3c7 !important;
-    }
-    .dark .note-emerald {
-      background: #064e3b !important;
-      color: #d1fae5 !important;
-    }
-    .dark .note-sky {
-      background: #0c4a6e !important;
-      color: #e0f2fe !important;
-    }
-    .dark .note-purple {
-      background: #4c1d95 !important;
-      color: #ede9fe !important;
-    }
-    .dark .note-rose {
-      background: #9f1239 !important;
-      color: #ffe4e6 !important;
-    }
-    .dark .note-white {
-      background: #1e293b !important;
-      color: #e2e8f0 !important;
-    }
+    .dark .note-amber { background: #78350f !important; color: #fef3c7 !important; }
+    .dark .note-emerald { background: #064e3b !important; color: #d1fae5 !important; }
+    .dark .note-sky { background: #0c4a6e !important; color: #e0f2fe !important; }
+    .dark .note-purple { background: #4c1d95 !important; color: #ede9fe !important; }
+    .dark .note-rose { background: #9f1239 !important; color: #ffe4e6 !important; }
+    .dark .note-white { background: #1e293b !important; color: #e2e8f0 !important; }
 
-    /* Make inputs/content inside colored notes inherit properly */
-    .dark .note-amber input,
-    .dark .note-amber [contenteditable],
-    .dark .note-emerald input,
-    .dark .note-emerald [contenteditable],
-    .dark .note-sky input,
-    .dark .note-sky [contenteditable],
-    .dark .note-purple input,
-    .dark .note-purple [contenteditable],
-    .dark .note-rose input,
-    .dark .note-rose [contenteditable] {
+    .dark .note-amber input, .dark .note-amber [contenteditable],
+    .dark .note-emerald input, .dark .note-emerald [contenteditable],
+    .dark .note-sky input, .dark .note-sky [contenteditable],
+    .dark .note-purple input, .dark .note-purple [contenteditable],
+    .dark .note-rose input, .dark .note-rose [contenteditable] {
       background: transparent !important;
       color: inherit !important;
     }
@@ -133,8 +118,12 @@
       color: #fde68a;
       border-color: #b45309;
     }
+    .dark .url-link {
+      background: #0c4a6e;
+      color: #7dd3fc;
+      border-color: #0284c7;
+    }
 
-    /* Theme switch */
     .theme-switch {
       position: relative;
       width: 44px;
@@ -161,6 +150,8 @@
       min-height: 60px;
       outline: none;
       line-height: 1.5;
+      word-break: break-word;
+      overflow-wrap: anywhere;
     }
     [contenteditable]:empty:before {
       content: attr(data-placeholder);
@@ -168,6 +159,26 @@
       pointer-events: none;
     }
     .dark [contenteditable]:empty:before { color: #64748b; }
+
+    /* Sticky controls on mobile so buttons never go off-screen */
+    @media (max-width: 640px) {
+      #c-controls, .sticky-controls {
+        position: sticky;
+        bottom: 0;
+        z-index: 10;
+        box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+      }
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #9ca3af;
+      margin-bottom: 0.75rem;
+      padding-left: 0.25rem;
+    }
 
     @media (prefers-reduced-motion: reduce) {
       * { transition: none !important; }
@@ -187,7 +198,7 @@
       </div>
       <div class="hidden sm:block">
         <div class="font-bold text-lg tracking-tight leading-none">mbnotes.online</div>
-        <div class="text-[11px] text-gray-400 font-medium">Alpha Release · v1.0</div>
+        <div class="text-[11px] text-gray-400 font-medium">Alpha Release · v1.1</div>
       </div>
     </div>
 
@@ -243,11 +254,14 @@
         <div class="p-4">
           <input id="c-title" placeholder="Title (optional)" class="w-full font-semibold text-gray-900 placeholder-gray-400 outline-none mb-2 hidden">
           
-          <div id="c-format-bar" class="hidden flex items-center gap-1 mb-2 pb-2 border-b border-gray-100">
+          <div id="c-format-bar" class="hidden flex items-center gap-1 mb-2 pb-2 border-b border-gray-100 flex-wrap">
             <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="bold" title="Bold"><i class="fa-solid fa-bold text-sm"></i></button>
             <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="italic" title="Italic"><i class="fa-solid fa-italic text-sm"></i></button>
             <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="underline" title="Underline"><i class="fa-solid fa-underline text-sm"></i></button>
             <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="strikeThrough" title="Strikethrough"><i class="fa-solid fa-strikethrough text-sm"></i></button>
+            <div class="w-px h-4 bg-gray-200 mx-1"></div>
+            <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="insertUnorderedList" title="Bullet list"><i class="fa-solid fa-list-ul text-sm"></i></button>
+            <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="insertOrderedList" title="Numbered list"><i class="fa-solid fa-list-ol text-sm"></i></button>
             <div class="w-px h-4 bg-gray-200 mx-1"></div>
             <button onclick="app.undo()" class="p-1.5 rounded hover:bg-gray-100" title="Undo"><i class="fa-solid fa-rotate-left text-sm"></i></button>
             <button onclick="app.redo()" class="p-1.5 rounded hover:bg-gray-100" title="Redo"><i class="fa-solid fa-rotate-right text-sm"></i></button>
@@ -255,7 +269,7 @@
 
           <div id="c-content" contenteditable="true" 
                class="w-full text-sm text-gray-700 outline-none min-h-[42px]"
-               data-placeholder="Write a note…  #tags  [[links]]"></div>
+               data-placeholder="Write a note…  #tags  [[links]]  https://…"></div>
           
           <div id="c-attachments" class="flex flex-wrap gap-2 mt-3 hidden"></div>
           <div id="c-checklist" class="hidden mt-3 space-y-1.5"></div>
@@ -277,20 +291,17 @@
               <input type="file" class="hidden" multiple accept="image/*,.pdf,.txt,.md,.doc,.docx,.zip" onchange="app.handleFiles(event, 'capture')">
             </label>
           </div>
-          <div class="flex items-center gap-2">
-            <button onclick="app.closeCapture()" class="px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-200 rounded-lg">Cancel</button>
-            <button onclick="app.saveNote()" class="px-4 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-lg">Save note</button>
-          </div>
+          <div class="text-xs text-gray-400">Auto-saves • Esc to close</div>
         </div>
       </div>
 
       <div class="max-w-6xl mx-auto">
-        <div id="notes" class="masonry"></div>
+        <div id="notes"></div>
         <div id="empty" class="hidden text-center py-20 text-gray-400">
           <div class="text-5xl mb-4 opacity-40"><i class="fa-solid fa-pen-to-square"></i></div>
           <p class="font-medium text-gray-600">No notes yet</p>
-          <p class="text-sm mt-2 max-w-xs mx-auto">Type above and press Ctrl + Enter to save.</p>
-          <button onclick="app.seedDemoNotes()" class="mt-6 px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-xl">
+          <p class="text-sm mt-2 max-w-xs mx-auto">Type above — notes auto-save.</p>
+          <button onclick="app.seedDemoNotes()" class="mt-6 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-xl">
             Load demo notes
           </button>
         </div>
@@ -300,15 +311,18 @@
 
   <!-- Edit Modal -->
   <div id="modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-    <div id="modal-card" class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
-      <div class="p-5">
+    <div id="modal-card" class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col">
+      <div class="p-5 flex-1 overflow-y-auto">
         <input id="e-title" class="note-input w-full font-bold text-lg outline-none border-b pb-2 mb-3 bg-transparent" placeholder="Title">
         
-        <div class="flex items-center gap-1 mb-2 pb-2 border-b border-black/10">
+        <div class="flex items-center gap-1 mb-2 pb-2 border-b border-black/10 flex-wrap">
           <button class="format-btn p-1.5 rounded hover:bg-black/5" data-cmd="bold" title="Bold"><i class="fa-solid fa-bold text-sm"></i></button>
           <button class="format-btn p-1.5 rounded hover:bg-black/5" data-cmd="italic" title="Italic"><i class="fa-solid fa-italic text-sm"></i></button>
           <button class="format-btn p-1.5 rounded hover:bg-black/5" data-cmd="underline" title="Underline"><i class="fa-solid fa-underline text-sm"></i></button>
           <button class="format-btn p-1.5 rounded hover:bg-black/5" data-cmd="strikeThrough" title="Strikethrough"><i class="fa-solid fa-strikethrough text-sm"></i></button>
+          <div class="w-px h-4 bg-black/20 mx-1"></div>
+          <button class="format-btn p-1.5 rounded hover:bg-black/5" data-cmd="insertUnorderedList" title="Bullet list"><i class="fa-solid fa-list-ul text-sm"></i></button>
+          <button class="format-btn p-1.5 rounded hover:bg-black/5" data-cmd="insertOrderedList" title="Numbered list"><i class="fa-solid fa-list-ol text-sm"></i></button>
           <div class="w-px h-4 bg-black/20 mx-1"></div>
           <button onclick="app.undo()" class="p-1.5 rounded hover:bg-black/5" title="Undo"><i class="fa-solid fa-rotate-left text-sm"></i></button>
           <button onclick="app.redo()" class="p-1.5 rounded hover:bg-black/5" title="Redo"><i class="fa-solid fa-rotate-right text-sm"></i></button>
@@ -325,29 +339,26 @@
           <p class="text-xs font-semibold opacity-60 uppercase mb-2">Linked from</p>
           <div id="backlinks-list" class="flex flex-wrap gap-1.5"></div>
         </div>
+      </div>
 
-        <div class="flex items-center justify-between pt-3 border-t border-black/10 gap-2 flex-wrap">
-          <div class="flex items-center gap-1">
-            <div class="flex gap-1.5">
-              <button data-ecolor="bg-white" data-edark="note-white" class="ecolor-btn w-6 h-6 rounded-full bg-white border border-gray-300"></button>
-              <button data-ecolor="bg-amber-100" data-edark="note-amber" class="ecolor-btn w-6 h-6 rounded-full bg-amber-200 border border-amber-300"></button>
-              <button data-ecolor="bg-emerald-100" data-edark="note-emerald" class="ecolor-btn w-6 h-6 rounded-full bg-emerald-200 border border-emerald-300"></button>
-              <button data-ecolor="bg-sky-100" data-edark="note-sky" class="ecolor-btn w-6 h-6 rounded-full bg-sky-200 border border-sky-300"></button>
-              <button data-ecolor="bg-purple-100" data-edark="note-purple" class="ecolor-btn w-6 h-6 rounded-full bg-purple-200 border border-purple-300"></button>
-              <button data-ecolor="bg-rose-100" data-edark="note-rose" class="ecolor-btn w-6 h-6 rounded-full bg-rose-200 border border-rose-300"></button>
-            </div>
-            <button id="e-toggle-checklist" class="p-2 opacity-70 hover:opacity-100 rounded-lg" title="Convert to checklist"><i class="fa-solid fa-square-check"></i></button>
-            <label class="p-2 opacity-70 hover:opacity-100 rounded-lg cursor-pointer" title="Attach file">
-              <i class="fa-solid fa-paperclip"></i>
-              <input type="file" class="hidden" multiple accept="image/*,.pdf,.txt,.md,.doc,.docx,.zip" onchange="app.handleFiles(event, 'edit')">
-            </label>
-            <button id="share-btn" class="p-2 opacity-70 hover:opacity-100 rounded-lg" title="Share note"><i class="fa-solid fa-share-nodes"></i></button>
+      <div class="sticky-controls px-5 py-3 border-t border-black/10 flex items-center justify-between gap-2 flex-wrap bg-inherit">
+        <div class="flex items-center gap-1">
+          <div class="flex gap-1.5">
+            <button data-ecolor="bg-white" data-edark="note-white" class="ecolor-btn w-6 h-6 rounded-full bg-white border border-gray-300"></button>
+            <button data-ecolor="bg-amber-100" data-edark="note-amber" class="ecolor-btn w-6 h-6 rounded-full bg-amber-200 border border-amber-300"></button>
+            <button data-ecolor="bg-emerald-100" data-edark="note-emerald" class="ecolor-btn w-6 h-6 rounded-full bg-emerald-200 border border-emerald-300"></button>
+            <button data-ecolor="bg-sky-100" data-edark="note-sky" class="ecolor-btn w-6 h-6 rounded-full bg-sky-200 border border-sky-300"></button>
+            <button data-ecolor="bg-purple-100" data-edark="note-purple" class="ecolor-btn w-6 h-6 rounded-full bg-purple-200 border border-purple-300"></button>
+            <button data-ecolor="bg-rose-100" data-edark="note-rose" class="ecolor-btn w-6 h-6 rounded-full bg-rose-200 border border-rose-300"></button>
           </div>
-          <div class="flex gap-2">
-            <button onclick="app.closeModal()" class="px-4 py-2 text-sm opacity-70 hover:opacity-100 rounded-xl">Cancel</button>
-            <button onclick="app.updateNote()" class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-xl">Save changes</button>
-          </div>
+          <button id="e-toggle-checklist" class="p-2 opacity-70 hover:opacity-100 rounded-lg" title="Convert to checklist"><i class="fa-solid fa-square-check"></i></button>
+          <label class="p-2 opacity-70 hover:opacity-100 rounded-lg cursor-pointer" title="Attach file">
+            <i class="fa-solid fa-paperclip"></i>
+            <input type="file" class="hidden" multiple accept="image/*,.pdf,.txt,.md,.doc,.docx,.zip" onchange="app.handleFiles(event, 'edit')">
+          </label>
+          <button id="share-btn" class="p-2 opacity-70 hover:opacity-100 rounded-lg" title="Share note"><i class="fa-solid fa-share-nodes"></i></button>
         </div>
+        <div class="text-xs opacity-50">Auto-saves • Esc to close</div>
       </div>
     </div>
   </div>
@@ -373,6 +384,7 @@ class MBNotes {
     this.redoStack = [];
     this.maxHistory = 40;
     this.STORAGE_KEY = 'mbnotes_notes_v3';
+    this.autoSaveTimer = null;
     
     this.init();
   }
@@ -421,7 +433,7 @@ class MBNotes {
       {
         id: crypto.randomUUID(),
         title: 'Welcome to mbnotes.online',
-        content: 'A fast, local-first notes app that lives entirely in your browser.<br><br><b>Try these features:</b><br>• Select text → use <b>Bold</b>, <i>Italic</i>, <u>Underline</u> or <s>Strikethrough</s><br>• Link notes with [[Project ideas]]<br>• Add #tags<br>• Attach images & files<br>• Turn any note into a checklist<br><br>Everything stays on your device. No account needed.',
+        content: 'A fast, local-first notes app that lives entirely in your browser.<br><br><b>Try these features:</b><br>• Select text → use <b>Bold</b>, <i>Italic</i>, <u>Underline</u> or <s>Strikethrough</s><br>• Link notes with [[Project ideas]]<br>• Add #tags<br>• Paste a URL like https://example.com — it becomes clickable<br>• Attach images & files<br>• Turn any note into a checklist<br>• Bullet & numbered lists<br><br>Everything stays on your device. No account needed.',
         color: 'bg-amber-100',
         darkClass: 'note-amber',
         pinned: true,
@@ -549,10 +561,29 @@ class MBNotes {
 
     document.getElementById('c-content').onfocus = () => this.expandCapture();
     
+    // Auto-save helpers
+    const scheduleCaptureSave = () => {
+      clearTimeout(this.autoSaveTimer);
+      this.autoSaveTimer = setTimeout(() => {}, 800); // state is kept live; real save on close
+    };
+    document.getElementById('c-content').addEventListener('input', scheduleCaptureSave);
+    document.getElementById('c-title').addEventListener('input', scheduleCaptureSave);
+
+    const scheduleEditSave = () => {
+      clearTimeout(this.autoSaveTimer);
+      this.autoSaveTimer = setTimeout(() => this.autoSaveEdit(), 500);
+    };
+    document.getElementById('e-content').addEventListener('input', scheduleEditSave);
+    document.getElementById('e-title').addEventListener('input', scheduleEditSave);
+
     document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        if (this.editingId) this.closeModal();
+        else this.closeCapture();
+      }
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-        if (this.editingId) this.updateNote();
-        else this.saveNote();
+        if (this.editingId) this.closeModal();
+        else this.closeCapture();
       }
       if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
         e.preventDefault();
@@ -583,9 +614,9 @@ class MBNotes {
       btn.onclick = () => {
         this.editColor = btn.dataset.ecolor;
         this.editDark = btn.dataset.edark;
-        // Apply both light and dark classes
         document.getElementById('modal-card').className = 
-          `rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl ${this.editColor} ${this.editDark}`;
+          `rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col ${this.editColor} ${this.editDark}`;
+        this.autoSaveEdit();
       };
     });
 
@@ -609,6 +640,7 @@ class MBNotes {
         document.getElementById('e-checklist').classList.remove('hidden');
         this.renderEditChecklist();
       }
+      this.autoSaveEdit();
     };
 
     document.getElementById('share-btn').onclick = () => this.shareNote();
@@ -627,7 +659,37 @@ class MBNotes {
     document.getElementById('capture').classList.add('ring-2', 'ring-amber-400/40');
   }
 
+  isEmptyNote(title, content, items, attachments) {
+    const plain = (content || '').replace(/<[^>]+>/g, '').trim();
+    return !title.trim() && !plain && items.filter(i => i.text.trim()).length === 0 && attachments.length === 0;
+  }
+
   closeCapture() {
+    const title = document.getElementById('c-title').value.trim();
+    const content = document.getElementById('c-content').innerHTML.trim();
+    const items = this.captureItems.filter(i => i.text.trim());
+
+    if (!this.isEmptyNote(title, content, items, this.captureAttachments)) {
+      const note = {
+        id: crypto.randomUUID(),
+        title: title || (content.replace(/<[^>]+>/g, '').slice(0, 48) || 'Untitled'),
+        content,
+        color: this.captureColor,
+        darkClass: this.captureDark,
+        pinned: false,
+        isChecklist: items.length > 0,
+        checklistItems: items,
+        attachments: [...this.captureAttachments],
+        tags: this.extractTags(title + ' ' + content.replace(/<[^>]+>/g, '')),
+        archived: false,
+        trashed: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      this.notes.unshift(note);
+      this.persist();
+    }
+
     document.getElementById('c-title').value = '';
     document.getElementById('c-content').innerHTML = '';
     document.getElementById('c-title').classList.add('hidden');
@@ -643,6 +705,30 @@ class MBNotes {
     this.captureAttachments = [];
     this.undoStack = [];
     this.redoStack = [];
+    this.render();
+  }
+
+  autoSaveEdit() {
+    if (!this.editingId) return;
+    const note = this.notes.find(n => n.id === this.editingId);
+    if (!note) return;
+
+    const title = document.getElementById('e-title').value.trim();
+    const content = document.getElementById('e-content').innerHTML.trim();
+    const items = this.editItems.filter(i => i.text.trim());
+
+    if (this.isEmptyNote(title, content, items, this.editAttachments)) return;
+
+    note.title = title || 'Untitled';
+    note.content = content;
+    note.color = this.editColor;
+    note.darkClass = this.editDark;
+    note.checklistItems = items;
+    note.isChecklist = items.length > 0;
+    note.attachments = [...this.editAttachments];
+    note.tags = this.extractTags(note.title + ' ' + note.content.replace(/<[^>]+>/g, ''));
+    note.updatedAt = new Date().toISOString();
+    this.persist();
   }
 
   async handleFiles(event, mode) {
@@ -663,6 +749,7 @@ class MBNotes {
       } else {
         this.editAttachments.push(att);
         this.renderEditAttachments();
+        this.autoSaveEdit();
       }
     }
     event.target.value = '';
@@ -696,6 +783,19 @@ class MBNotes {
     } else {
       this.editAttachments.splice(i, 1);
       this.renderEditAttachments();
+      this.autoSaveEdit();
+    }
+  }
+
+  moveChecklistItem(mode, index, direction) {
+    const items = mode === 'capture' ? this.captureItems : this.editItems;
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= items.length) return;
+    [items[index], items[newIndex]] = [items[newIndex], items[index]];
+    if (mode === 'capture') this.renderCaptureChecklist();
+    else {
+      this.renderEditChecklist();
+      this.autoSaveEdit();
     }
   }
 
@@ -705,6 +805,8 @@ class MBNotes {
       <div class="flex items-center gap-2">
         <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="app.captureItems[${i}].completed = this.checked">
         <input type="text" value="${this.escape(item.text)}" placeholder="List item" class="flex-1 text-sm bg-transparent outline-none" oninput="app.captureItems[${i}].text = this.value">
+        <button onclick="app.moveChecklistItem('capture', ${i}, -1)" class="opacity-50 hover:opacity-100 p-1" title="Move up"><i class="fa-solid fa-chevron-up text-xs"></i></button>
+        <button onclick="app.moveChecklistItem('capture', ${i}, 1)" class="opacity-50 hover:opacity-100 p-1" title="Move down"><i class="fa-solid fa-chevron-down text-xs"></i></button>
         <button onclick="app.captureItems.splice(${i},1); app.renderCaptureChecklist()" class="opacity-60 hover:opacity-100"><i class="fa-solid fa-xmark"></i></button>
       </div>`).join('') + 
       `<button onclick="app.captureItems.push({text:'',completed:false}); app.renderCaptureChecklist()" class="text-xs text-amber-600 font-medium mt-1">+ Add item</button>`;
@@ -714,43 +816,17 @@ class MBNotes {
     const el = document.getElementById('e-checklist');
     el.innerHTML = this.editItems.map((item, i) => `
       <div class="flex items-center gap-2">
-        <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="app.editItems[${i}].completed = this.checked; app.renderEditChecklist()">
-        <input type="text" value="${this.escape(item.text)}" class="flex-1 text-sm bg-transparent outline-none" oninput="app.editItems[${i}].text = this.value">
-        <button onclick="app.editItems.splice(${i},1); app.renderEditChecklist()" class="opacity-60 hover:opacity-100"><i class="fa-solid fa-xmark"></i></button>
+        <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="app.editItems[${i}].completed = this.checked; app.renderEditChecklist(); app.autoSaveEdit()">
+        <input type="text" value="${this.escape(item.text)}" class="flex-1 text-sm bg-transparent outline-none" oninput="app.editItems[${i}].text = this.value; app.autoSaveEdit()">
+        <button onclick="app.moveChecklistItem('edit', ${i}, -1)" class="opacity-50 hover:opacity-100 p-1" title="Move up"><i class="fa-solid fa-chevron-up text-xs"></i></button>
+        <button onclick="app.moveChecklistItem('edit', ${i}, 1)" class="opacity-50 hover:opacity-100 p-1" title="Move down"><i class="fa-solid fa-chevron-down text-xs"></i></button>
+        <button onclick="app.editItems.splice(${i},1); app.renderEditChecklist(); app.autoSaveEdit()" class="opacity-60 hover:opacity-100"><i class="fa-solid fa-xmark"></i></button>
       </div>`).join('') + 
       `<button onclick="app.editItems.push({text:'',completed:false}); app.renderEditChecklist()" class="text-xs text-amber-600 font-medium">+ Add item</button>`;
   }
 
   extractTags(text) {
     return [...text.matchAll(/#([a-zA-Z0-9_-]+)/g)].map(m => m[1].toLowerCase());
-  }
-
-  async saveNote() {
-    const title = document.getElementById('c-title').value.trim();
-    const content = document.getElementById('c-content').innerHTML.trim();
-    const items = this.captureItems.filter(i => i.text.trim());
-    if (!title && !content && items.length === 0 && this.captureAttachments.length === 0) return;
-
-    const note = {
-      id: crypto.randomUUID(),
-      title: title || (content.replace(/<[^>]+>/g, '').slice(0, 48) || 'Untitled'),
-      content,
-      color: this.captureColor,
-      darkClass: this.captureDark,
-      pinned: false,
-      isChecklist: items.length > 0,
-      checklistItems: items,
-      attachments: [...this.captureAttachments],
-      tags: this.extractTags(title + ' ' + content.replace(/<[^>]+>/g, '')),
-      archived: false,
-      trashed: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    this.notes.unshift(note);
-    this.persist();
-    this.closeCapture();
-    this.render();
   }
 
   async openNote(id) {
@@ -767,9 +843,8 @@ class MBNotes {
     document.getElementById('e-title').value = note.title;
     document.getElementById('e-content').innerHTML = note.content || '';
     
-    // Apply both light color + dark mode class
     document.getElementById('modal-card').className = 
-      `rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl ${this.editColor} ${this.editDark}`;
+      `rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col ${this.editColor} ${this.editDark}`;
 
     const cl = document.getElementById('e-checklist');
     if (note.isChecklist || this.editItems.length) {
@@ -792,28 +867,35 @@ class MBNotes {
     document.getElementById('e-title').focus();
   }
 
-  async updateNote() {
-    const note = this.notes.find(n => n.id === this.editingId);
-    if (!note) return;
-    note.title = document.getElementById('e-title').value.trim() || 'Untitled';
-    note.content = document.getElementById('e-content').innerHTML.trim();
-    note.color = this.editColor;
-    note.darkClass = this.editDark;
-    note.checklistItems = this.editItems.filter(i => i.text.trim());
-    note.isChecklist = note.checklistItems.length > 0;
-    note.attachments = [...this.editAttachments];
-    note.tags = this.extractTags(note.title + ' ' + note.content.replace(/<[^>]+>/g, ''));
-    note.updatedAt = new Date().toISOString();
-    this.persist();
-    this.closeModal();
-    this.render();
-  }
-
   closeModal() {
+    if (!this.editingId) return;
+    const note = this.notes.find(n => n.id === this.editingId);
+    if (note) {
+      const title = document.getElementById('e-title').value.trim();
+      const content = document.getElementById('e-content').innerHTML.trim();
+      const items = this.editItems.filter(i => i.text.trim());
+
+      if (this.isEmptyNote(title, content, items, this.editAttachments)) {
+        this.notes = this.notes.filter(n => n.id !== this.editingId);
+      } else {
+        note.title = title || 'Untitled';
+        note.content = content;
+        note.color = this.editColor;
+        note.darkClass = this.editDark;
+        note.checklistItems = items;
+        note.isChecklist = items.length > 0;
+        note.attachments = [...this.editAttachments];
+        note.tags = this.extractTags(note.title + ' ' + note.content.replace(/<[^>]+>/g, ''));
+        note.updatedAt = new Date().toISOString();
+      }
+      this.persist();
+    }
+
     this.editingId = null;
     document.getElementById('modal').classList.add('hidden');
     this.undoStack = [];
     this.redoStack = [];
+    this.render();
   }
 
   async shareNote() {
@@ -853,13 +935,26 @@ class MBNotes {
     this.render();
   }
 
+  // Linkify both [[note links]] and regular http/https URLs
   formatContent(html) {
-    return (html || '').replace(/\[\[([^\]]+)\]\]/g, (_, title) => {
+    let out = html || '';
+
+    // First protect existing <a> tags if any
+    // Note wiki links
+    out = out.replace(/\[\[([^\]]+)\]\]/g, (_, title) => {
       const target = this.notes.find(n => n.title === title && !n.trashed);
       return target
-        ? `<span class="note-link" onclick="event.stopPropagation(); app.openNote('${target.id}')">${title}</span>`
-        : `<span class="note-link opacity-60">[[${title}]]</span>`;
+        ? `<span class="note-link" onclick="event.stopPropagation(); app.openNote('${target.id}')">${this.escape(title)}</span>`
+        : `<span class="note-link opacity-60">[[${this.escape(title)}]]</span>`;
     });
+
+    // Regular website URLs (http/https)
+    out = out.replace(/(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/g, (url) => {
+      // Avoid double-linking if already inside an <a>
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="url-link" onclick="event.stopPropagation()">${this.escape(url)}</a>`;
+    });
+
+    return out;
   }
 
   escape(str) {
@@ -875,6 +970,66 @@ class MBNotes {
       if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
       return new Date(iso).toLocaleDateString();
     } catch { return ''; }
+  }
+
+  renderNoteCard(note) {
+    const done = note.checklistItems?.filter(i => i.completed).length || 0;
+    const total = note.checklistItems?.length || 0;
+    const darkCls = note.darkClass || this.colorToDark(note.color);
+
+    return `
+      <div class="masonry-item note-card ${note.color || 'bg-white'} ${darkCls} rounded-2xl p-4 border border-gray-200/80 shadow-sm hover:shadow-md transition cursor-pointer relative group"
+           onclick="app.openNote('${note.id}')">
+        <div class="note-actions absolute top-2.5 right-2.5 flex gap-0.5 rounded-lg px-1 py-0.5">
+          ${!note.trashed ? `
+            <button onclick="event.stopPropagation(); app.toggle('${note.id}','pinned')" class="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-amber-600 rounded-md">
+              <i class="fa-solid fa-thumbtack text-xs ${note.pinned ? 'text-amber-600' : ''}"></i>
+            </button>
+            <button onclick="event.stopPropagation(); app.toggle('${note.id}','archived')" class="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-800 rounded-md">
+              <i class="fa-solid fa-box-archive text-xs"></i>
+            </button>
+            <button onclick="event.stopPropagation(); app.toggle('${note.id}','trashed')" class="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-red-600 rounded-md">
+              <i class="fa-solid fa-trash text-xs"></i>
+            </button>
+          ` : `
+            <button onclick="event.stopPropagation(); app.toggle('${note.id}','trashed')" class="w-7 h-7 flex items-center justify-center text-green-600 rounded-md">
+              <i class="fa-solid fa-rotate-left text-xs"></i>
+            </button>
+            <button onclick="event.stopPropagation(); app.deletePermanent('${note.id}')" class="w-7 h-7 flex items-center justify-center text-red-600 rounded-md">
+              <i class="fa-solid fa-trash-can text-xs"></i>
+            </button>
+          `}
+        </div>
+
+        <h3 class="font-semibold pr-16 mb-1 break-words">${this.escape(note.title)}</h3>
+        <div class="text-sm leading-relaxed mb-3 opacity-90 break-words">${this.formatContent(note.content)}</div>
+
+        ${note.attachments?.length ? `
+          <div class="flex flex-wrap gap-2 mb-3">
+            ${note.attachments.slice(0, 3).map(a => a.type.startsWith('image/') 
+              ? `<img src="${a.data}" class="w-14 h-14 object-cover rounded-lg border">`
+              : `<div class="attachment-chip flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg"><i class="fa-solid fa-file"></i>${this.escape(a.name.slice(0,12))}</div>`
+            ).join('')}
+          </div>
+        ` : ''}
+
+        ${total > 0 ? `
+          <div class="space-y-1 mb-3 pt-2 border-t border-black/10">
+            <div class="text-[11px] opacity-60 mb-1">${done}/${total} done</div>
+            ${note.checklistItems.map((item, i) => `
+              <label class="flex items-center gap-2 text-xs cursor-pointer" onclick="event.stopPropagation()">
+                <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="app.toggleCheckItem('${note.id}', ${i})">
+                <span class="${item.completed ? 'line-through opacity-50' : ''} break-words">${this.escape(item.text)}</span>
+              </label>
+            `).join('')}
+          </div>
+        ` : ''}
+
+        <div class="flex flex-wrap items-center gap-1.5 mt-2">
+          ${note.tags?.map(t => `<span class="text-[11px] font-medium bg-black/10 px-2 py-0.5 rounded-md">#${t}</span>`).join('') || ''}
+          <span class="text-[11px] opacity-50 ml-auto">${this.timeAgo(note.updatedAt)}</span>
+        </div>
+      </div>`;
   }
 
   render() {
@@ -911,10 +1066,7 @@ class MBNotes {
       );
     }
 
-    list.sort((a, b) => {
-      if (a.pinned !== b.pinned) return b.pinned - a.pinned;
-      return new Date(b.updatedAt) - new Date(a.updatedAt);
-    });
+    list.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
     const container = document.getElementById('notes');
     const empty = document.getElementById('empty');
@@ -926,65 +1078,22 @@ class MBNotes {
     }
     empty.classList.add('hidden');
 
-    container.innerHTML = list.map(note => {
-      const done = note.checklistItems?.filter(i => i.completed).length || 0;
-      const total = note.checklistItems?.length || 0;
-      const darkCls = note.darkClass || this.colorToDark(note.color);
+    // Separate pinned notes into their own section when viewing "All"
+    if (this.filter === 'all' && !this.query) {
+      const pinned = list.filter(n => n.pinned);
+      const others = list.filter(n => !n.pinned);
 
-      return `
-        <div class="masonry-item note-card ${note.color || 'bg-white'} ${darkCls} rounded-2xl p-4 border border-gray-200/80 shadow-sm hover:shadow-md transition cursor-pointer relative group"
-             onclick="app.openNote('${note.id}')">
-          <div class="note-actions absolute top-2.5 right-2.5 flex gap-0.5 rounded-lg px-1 py-0.5">
-            ${!note.trashed ? `
-              <button onclick="event.stopPropagation(); app.toggle('${note.id}','pinned')" class="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-amber-600 rounded-md">
-                <i class="fa-solid fa-thumbtack text-xs ${note.pinned ? 'text-amber-600' : ''}"></i>
-              </button>
-              <button onclick="event.stopPropagation(); app.toggle('${note.id}','archived')" class="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-800 rounded-md">
-                <i class="fa-solid fa-box-archive text-xs"></i>
-              </button>
-              <button onclick="event.stopPropagation(); app.toggle('${note.id}','trashed')" class="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-red-600 rounded-md">
-                <i class="fa-solid fa-trash text-xs"></i>
-              </button>
-            ` : `
-              <button onclick="event.stopPropagation(); app.toggle('${note.id}','trashed')" class="w-7 h-7 flex items-center justify-center text-green-600 rounded-md">
-                <i class="fa-solid fa-rotate-left text-xs"></i>
-              </button>
-              <button onclick="event.stopPropagation(); app.deletePermanent('${note.id}')" class="w-7 h-7 flex items-center justify-center text-red-600 rounded-md">
-                <i class="fa-solid fa-trash-can text-xs"></i>
-              </button>
-            `}
-          </div>
-
-          <h3 class="font-semibold pr-16 mb-1">${this.escape(note.title)}</h3>
-          <div class="text-sm leading-relaxed mb-3 opacity-90">${this.formatContent(note.content)}</div>
-
-          ${note.attachments?.length ? `
-            <div class="flex flex-wrap gap-2 mb-3">
-              ${note.attachments.slice(0, 3).map(a => a.type.startsWith('image/') 
-                ? `<img src="${a.data}" class="w-14 h-14 object-cover rounded-lg border">`
-                : `<div class="attachment-chip flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg"><i class="fa-solid fa-file"></i>${this.escape(a.name.slice(0,12))}</div>`
-              ).join('')}
-            </div>
-          ` : ''}
-
-          ${total > 0 ? `
-            <div class="space-y-1 mb-3 pt-2 border-t border-black/10">
-              <div class="text-[11px] opacity-60 mb-1">${done}/${total} done</div>
-              ${note.checklistItems.map((item, i) => `
-                <label class="flex items-center gap-2 text-xs cursor-pointer" onclick="event.stopPropagation()">
-                  <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="app.toggleCheckItem('${note.id}', ${i})">
-                  <span class="${item.completed ? 'line-through opacity-50' : ''}">${this.escape(item.text)}</span>
-                </label>
-              `).join('')}
-            </div>
-          ` : ''}
-
-          <div class="flex flex-wrap items-center gap-1.5 mt-2">
-            ${note.tags?.map(t => `<span class="text-[11px] font-medium bg-black/10 px-2 py-0.5 rounded-md">#${t}</span>`).join('') || ''}
-            <span class="text-[11px] opacity-50 ml-auto">${this.timeAgo(note.updatedAt)}</span>
-          </div>
-        </div>`;
-    }).join('');
+      let html = '';
+      if (pinned.length) {
+        html += `<div class="mb-6"><div class="section-label">Pinned</div><div class="masonry">${pinned.map(n => this.renderNoteCard(n)).join('')}</div></div>`;
+      }
+      if (others.length) {
+        html += `<div><div class="section-label">${pinned.length ? 'Others' : ''}</div><div class="masonry">${others.map(n => this.renderNoteCard(n)).join('')}</div></div>`;
+      }
+      container.innerHTML = html;
+    } else {
+      container.innerHTML = `<div class="masonry">${list.map(n => this.renderNoteCard(n)).join('')}</div>`;
+    }
   }
 
   exportJSON() {
