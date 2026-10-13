@@ -91,7 +91,6 @@
     .dark .note-link { background: #92400e; color: #fde68a; border-color: #b45309; }
     .dark .url-link { background: #0c4a6e; color: #7dd3fc; border-color: #0284c7; }
 
-    /* Search bar visibility */
     #search { background: #e5e7eb !important; border: 1px solid #d1d5db; }
     .dark #search { background: #1e293b !important; border: 1px solid #475569; color: #f1f5f9 !important; }
     #search:focus { background: #ffffff !important; border-color: #f59e0b; }
@@ -135,7 +134,6 @@
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
-  <!-- Header -->
   <header class="bg-white border-b sticky top-0 z-40 px-3 py-2.5 flex items-center gap-3 shadow-sm">
     <button id="sidebar-toggle" class="md:hidden p-2.5 text-gray-500 hover:bg-gray-100 rounded-lg">
       <i class="fa-solid fa-bars"></i>
@@ -256,7 +254,6 @@
     </main>
   </div>
 
-  <!-- Edit Modal -->
   <div id="modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
     <div id="modal-card" class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col">
       <div class="p-5 flex-1 overflow-y-auto">
@@ -332,7 +329,6 @@ class MBNotes {
     this.maxHistory = 40;
     this.STORAGE_KEY = 'mbnotes_notes_v3';
     this.autoSaveTimer = null;
-    
     this.init();
   }
 
@@ -437,7 +433,6 @@ class MBNotes {
     el.innerHTML = this.redoStack.pop();
   }
 
-  // ========== LIST HELPERS ==========
   getActiveEditor() {
     return this.editingId ? document.getElementById('e-content') : document.getElementById('c-content');
   }
@@ -448,15 +443,18 @@ class MBNotes {
     el.focus();
 
     const sel = window.getSelection();
-    if (!sel.rangeCount) return;
+    if (!sel.rangeCount) {
+      // fallback if no selection
+      el.innerHTML += text;
+      this.saveState(el.innerHTML);
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      return;
+    }
 
     const range = sel.getRangeAt(0);
     range.deleteContents();
-
     const textNode = document.createTextNode(text);
     range.insertNode(textNode);
-
-    // Move cursor after the inserted text
     range.setStartAfter(textNode);
     range.setEndAfter(textNode);
     sel.removeAllRanges();
@@ -470,55 +468,61 @@ class MBNotes {
     const el = this.getActiveEditor();
     if (!el) return;
     el.focus();
-
-    if (type === 'bullet') {
-      this.insertAtCursor('• ');
-    } else {
-      this.insertAtCursor('1. ');
-    }
+    if (type === 'bullet') this.insertAtCursor('• ');
+    else this.insertAtCursor('1. ');
   }
 
-  // Continue list on Enter
+  // More reliable current-line extraction for contenteditable
+  getCurrentLine(el) {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return '';
+
+    const range = sel.getRangeAt(0);
+    const preRange = document.createRange();
+    preRange.selectNodeContents(el);
+    preRange.setEnd(range.startContainer, range.startOffset);
+
+    const temp = document.createElement('div');
+    temp.appendChild(preRange.cloneContents());
+
+    // Normalize HTML → plain text with real newlines
+    let html = temp.innerHTML
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/(div|p|li|h[1-6])>/gi, '\n')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/\u00a0/g, ' ');
+
+    // Decode basic entities
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = html;
+    const text = textarea.value;
+
+    const lines = text.split(/\n/);
+    return (lines[lines.length - 1] || '').trimEnd();
+  }
+
   handleListEnter(e, el) {
     if (e.key !== 'Enter' || e.shiftKey) return;
 
-    const sel = window.getSelection();
-    if (!sel.rangeCount) return;
-
-    // Get the text of the current line
-    const range = sel.getRangeAt(0);
-    const preRange = range.cloneRange();
-    preRange.selectNodeContents(el);
-    preRange.setEnd(range.startContainer, range.startOffset);
-    const textBefore = preRange.toString();
-    const lines = textBefore.split('\n');
-    const currentLine = lines[lines.length - 1] || '';
+    const currentLine = this.getCurrentLine(el);
 
     // Bullet list
-    if (/^•\s/.test(currentLine.trim()) || currentLine.trim() === '•') {
+    if (/^\s*•\s*/.test(currentLine) || currentLine.trim() === '•') {
       e.preventDefault();
-      // If the line is empty (just the bullet), exit the list
-      if (currentLine.trim() === '•' || currentLine.trim() === '• ') {
-        // Remove the bullet and just do a normal newline
-        document.execCommand('insertHTML', false, '<br>');
-      } else {
-        document.execCommand('insertHTML', false, '<br>• ');
-      }
+      const isEmpty = /^\s*•\s*$/.test(currentLine);
+      document.execCommand('insertHTML', false, isEmpty ? '<br>' : '<br>• ');
       this.saveState(el.innerHTML);
       return;
     }
 
-    // Numbered list  (1.  2.  3. ...)
-    const numMatch = currentLine.trim().match(/^(\d+)\.\s/);
+    // Numbered list
+    const numMatch = currentLine.match(/^\s*(\d+)\.\s*/);
     if (numMatch) {
       e.preventDefault();
       const nextNum = parseInt(numMatch[1], 10) + 1;
-      // If line is empty (just the number), exit list
-      if (currentLine.trim() === numMatch[0].trim() || currentLine.trim() === numMatch[1] + '.') {
-        document.execCommand('insertHTML', false, '<br>');
-      } else {
-        document.execCommand('insertHTML', false, `<br>${nextNum}. `);
-      }
+      const isEmpty = /^\s*\d+\.\s*$/.test(currentLine);
+      document.execCommand('insertHTML', false, isEmpty ? '<br>' : `<br>${nextNum}. `);
       this.saveState(el.innerHTML);
     }
   }
@@ -573,7 +577,6 @@ class MBNotes {
     document.getElementById('e-content').addEventListener('input', scheduleEditSave);
     document.getElementById('e-title').addEventListener('input', scheduleEditSave);
 
-    // List continuation on Enter
     ['c-content', 'e-content'].forEach(id => {
       const el = document.getElementById(id);
       el.addEventListener('keydown', e => this.handleListEnter(e, el));
@@ -597,7 +600,6 @@ class MBNotes {
       }
     });
 
-    // Regular format buttons (bold etc)
     document.querySelectorAll('.format-btn').forEach(btn => {
       btn.onclick = (e) => {
         e.preventDefault();
@@ -607,7 +609,6 @@ class MBNotes {
       };
     });
 
-    // List buttons – reliable insertion
     document.querySelectorAll('.list-btn').forEach(btn => {
       btn.onclick = (e) => {
         e.preventDefault();
