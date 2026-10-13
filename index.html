@@ -32,50 +32,25 @@
       overflow-wrap: anywhere;
       max-width: 100%;
     }
-    .note-link {
-      background: #fef3c7;
-      color: #b45309;
-      border: 1px solid #fcd34d;
-    }
+    .note-link { background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; }
     .note-link:hover { background: #fde68a; }
-    .url-link {
-      background: #e0f2fe;
-      color: #0369a1;
-      border: 1px solid #7dd3fc;
-      text-decoration: none;
-    }
+    .url-link { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; text-decoration: none; }
     .url-link:hover { background: #bae6fd; }
 
     .note-actions {
-      opacity: 0;
-      transform: scale(0.95);
+      opacity: 0; transform: scale(0.95);
       transition: opacity 0.15s, transform 0.15s;
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
+      background: #ffffff; border: 1px solid #e5e7eb;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
-    .note-card:hover .note-actions,
-    .note-card:focus-within .note-actions {
-      opacity: 1;
-      transform: scale(1);
+    .note-card:hover .note-actions, .note-card:focus-within .note-actions {
+      opacity: 1; transform: scale(1);
     }
-    .dark .note-actions {
-      background: #1e293b;
-      border-color: #334155;
-    }
+    .dark .note-actions { background: #1e293b; border-color: #334155; }
 
-    .attachment-chip {
-      background: #f3f4f6;
-      color: #374151;
-      border: 1px solid #e5e7eb;
-    }
-    .dark .attachment-chip {
-      background: #334155;
-      color: #e2e8f0;
-      border-color: #475569;
-    }
+    .attachment-chip { background: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
+    .dark .attachment-chip { background: #334155; color: #e2e8f0; border-color: #475569; }
 
-    /* ===== Dark mode base ===== */
     .dark body, .dark { background: #0f172a; color: #e2e8f0; }
     .dark .bg-white { background: #1e293b !important; }
     .dark .bg-gray-50 { background: #0f172a !important; }
@@ -89,16 +64,10 @@
     .dark input:not(.note-input),
     .dark textarea:not(.note-input),
     .dark [contenteditable]:not(.note-content) {
-      background: #1e293b !important;
-      color: #f1f5f9 !important;
-      border-color: #334155 !important;
+      background: #1e293b !important; color: #f1f5f9 !important; border-color: #334155 !important;
     }
-    .dark input::placeholder,
-    .dark textarea::placeholder {
-      color: #64748b !important;
-    }
+    .dark input::placeholder, .dark textarea::placeholder { color: #64748b !important; }
 
-    /* Colored notes in dark mode – force text color on everything inside */
     .dark .note-amber { background: #78350f !important; color: #fef3c7 !important; }
     .dark .note-emerald { background: #064e3b !important; color: #d1fae5 !important; }
     .dark .note-sky { background: #0c4a6e !important; color: #e0f2fe !important; }
@@ -106,120 +75,62 @@
     .dark .note-rose { background: #9f1239 !important; color: #ffe4e6 !important; }
     .dark .note-white { background: #1e293b !important; color: #e2e8f0 !important; }
 
-    .dark .note-amber *,
-    .dark .note-emerald *,
-    .dark .note-sky *,
-    .dark .note-purple *,
-    .dark .note-rose *,
-    .dark .note-white * {
+    .dark .note-amber *, .dark .note-emerald *, .dark .note-sky *,
+    .dark .note-purple *, .dark .note-rose *, .dark .note-white * {
       color: inherit !important;
     }
-
-    .dark .note-amber input,
-    .dark .note-amber [contenteditable],
-    .dark .note-emerald input,
-    .dark .note-emerald [contenteditable],
-    .dark .note-sky input,
-    .dark .note-sky [contenteditable],
-    .dark .note-purple input,
-    .dark .note-purple [contenteditable],
-    .dark .note-rose input,
-    .dark .note-rose [contenteditable],
-    .dark .note-white input,
-    .dark .note-white [contenteditable] {
-      background: transparent !important;
-      color: inherit !important;
+    .dark .note-amber input, .dark .note-amber [contenteditable],
+    .dark .note-emerald input, .dark .note-emerald [contenteditable],
+    .dark .note-sky input, .dark .note-sky [contenteditable],
+    .dark .note-purple input, .dark .note-purple [contenteditable],
+    .dark .note-rose input, .dark .note-rose [contenteditable],
+    .dark .note-white input, .dark .note-white [contenteditable] {
+      background: transparent !important; color: inherit !important;
     }
 
-    .dark .note-link {
-      background: #92400e;
-      color: #fde68a;
-      border-color: #b45309;
-    }
-    .dark .url-link {
-      background: #0c4a6e;
-      color: #7dd3fc;
-      border-color: #0284c7;
-    }
+    .dark .note-link { background: #92400e; color: #fde68a; border-color: #b45309; }
+    .dark .url-link { background: #0c4a6e; color: #7dd3fc; border-color: #0284c7; }
 
-    /* Search bar – more visible in both modes */
-    #search {
-      background: #e5e7eb !important; /* light mode: stronger gray */
-      border: 1px solid #d1d5db;
-    }
-    .dark #search {
-      background: #1e293b !important;
-      border: 1px solid #475569;
-      color: #f1f5f9 !important;
-    }
-    #search:focus {
-      background: #ffffff !important;
-      border-color: #f59e0b;
-    }
-    .dark #search:focus {
-      background: #0f172a !important;
-      border-color: #f59e0b;
-    }
+    /* Search bar visibility */
+    #search { background: #e5e7eb !important; border: 1px solid #d1d5db; }
+    .dark #search { background: #1e293b !important; border: 1px solid #475569; color: #f1f5f9 !important; }
+    #search:focus { background: #ffffff !important; border-color: #f59e0b; }
+    .dark #search:focus { background: #0f172a !important; border-color: #f59e0b; }
 
     .theme-switch {
-      position: relative;
-      width: 44px;
-      height: 24px;
-      background: #d1d5db;
-      border-radius: 9999px;
-      cursor: pointer;
-      transition: background 0.2s;
+      position: relative; width: 44px; height: 24px;
+      background: #d1d5db; border-radius: 9999px; cursor: pointer; transition: background 0.2s;
     }
     .theme-switch::after {
-      content: '';
-      position: absolute;
-      top: 2px; left: 2px;
-      width: 20px; height: 20px;
-      background: white;
-      border-radius: 50%;
-      transition: transform 0.2s;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 20px; height: 20px; background: white; border-radius: 50%;
+      transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
     .dark .theme-switch { background: #f59e0b; }
     .dark .theme-switch::after { transform: translateX(20px); }
 
     [contenteditable] {
-      min-height: 60px;
-      outline: none;
-      line-height: 1.5;
-      word-break: break-word;
-      overflow-wrap: anywhere;
+      min-height: 60px; outline: none; line-height: 1.5;
+      word-break: break-word; overflow-wrap: anywhere;
     }
     [contenteditable]:empty:before {
-      content: attr(data-placeholder);
-      color: #9ca3af;
-      pointer-events: none;
+      content: attr(data-placeholder); color: #9ca3af; pointer-events: none;
     }
     .dark [contenteditable]:empty:before { color: #64748b; }
 
-    /* Sticky controls on mobile */
     @media (max-width: 640px) {
       #c-controls, .sticky-controls {
-        position: sticky;
-        bottom: 0;
-        z-index: 10;
+        position: sticky; bottom: 0; z-index: 10;
         box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
       }
     }
 
     .section-label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #9ca3af;
-      margin-bottom: 0.75rem;
-      padding-left: 0.25rem;
+      font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.05em; color: #9ca3af; margin-bottom: 0.75rem; padding-left: 0.25rem;
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      * { transition: none !important; }
-    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
@@ -286,7 +197,6 @@
     <div id="sidebar-backdrop" class="fixed inset-0 bg-black/40 z-20 hidden md:hidden"></div>
 
     <main class="flex-1 overflow-y-auto p-4 md:p-6">
-      <!-- Capture -->
       <div id="capture" class="max-w-2xl mx-auto mb-8 bg-white rounded-2xl border shadow-sm transition-all">
         <div class="p-4">
           <input id="c-title" placeholder="Title (optional)" class="w-full font-semibold text-gray-900 placeholder-gray-400 outline-none mb-2 hidden">
@@ -297,8 +207,8 @@
             <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="underline" title="Underline"><i class="fa-solid fa-underline text-sm"></i></button>
             <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="strikeThrough" title="Strikethrough"><i class="fa-solid fa-strikethrough text-sm"></i></button>
             <div class="w-px h-4 bg-gray-200 mx-1"></div>
-            <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="insertUnorderedList" title="Bullet list"><i class="fa-solid fa-list-ul text-sm"></i></button>
-            <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="insertOrderedList" title="Numbered list"><i class="fa-solid fa-list-ol text-sm"></i></button>
+            <button class="list-btn p-1.5 rounded hover:bg-gray-100" data-type="bullet" title="Bullet list"><i class="fa-solid fa-list-ul text-sm"></i></button>
+            <button class="list-btn p-1.5 rounded hover:bg-gray-100" data-type="number" title="Numbered list"><i class="fa-solid fa-list-ol text-sm"></i></button>
             <div class="w-px h-4 bg-gray-200 mx-1"></div>
             <button onclick="app.undo()" class="p-1.5 rounded hover:bg-gray-100" title="Undo"><i class="fa-solid fa-rotate-left text-sm"></i></button>
             <button onclick="app.redo()" class="p-1.5 rounded hover:bg-gray-100" title="Redo"><i class="fa-solid fa-rotate-right text-sm"></i></button>
@@ -358,8 +268,8 @@
           <button class="format-btn p-1.5 rounded hover:bg-black/5" data-cmd="underline" title="Underline"><i class="fa-solid fa-underline text-sm"></i></button>
           <button class="format-btn p-1.5 rounded hover:bg-black/5" data-cmd="strikeThrough" title="Strikethrough"><i class="fa-solid fa-strikethrough text-sm"></i></button>
           <div class="w-px h-4 bg-black/20 mx-1"></div>
-          <button class="format-btn p-1.5 rounded hover:bg-black/5" data-cmd="insertUnorderedList" title="Bullet list"><i class="fa-solid fa-list-ul text-sm"></i></button>
-          <button class="format-btn p-1.5 rounded hover:bg-black/5" data-cmd="insertOrderedList" title="Numbered list"><i class="fa-solid fa-list-ol text-sm"></i></button>
+          <button class="list-btn p-1.5 rounded hover:bg-black/5" data-type="bullet" title="Bullet list"><i class="fa-solid fa-list-ul text-sm"></i></button>
+          <button class="list-btn p-1.5 rounded hover:bg-black/5" data-type="number" title="Numbered list"><i class="fa-solid fa-list-ol text-sm"></i></button>
           <div class="w-px h-4 bg-black/20 mx-1"></div>
           <button onclick="app.undo()" class="p-1.5 rounded hover:bg-black/5" title="Undo"><i class="fa-solid fa-rotate-left text-sm"></i></button>
           <button onclick="app.redo()" class="p-1.5 rounded hover:bg-black/5" title="Redo"><i class="fa-solid fa-rotate-right text-sm"></i></button>
@@ -431,7 +341,6 @@ class MBNotes {
     if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
     }
-
     this.loadNotes();
     this.bindEvents();
     this.render();
@@ -448,21 +357,15 @@ class MBNotes {
       const raw = localStorage.getItem(this.STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) {
-          this.notes = parsed;
-          return;
-        }
+        if (Array.isArray(parsed)) { this.notes = parsed; return; }
       }
     } catch (e) {}
     this.notes = [];
   }
 
   persist() {
-    try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.notes));
-    } catch (e) {
-      alert('Could not save notes. Please export a backup.');
-    }
+    try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.notes)); }
+    catch (e) { alert('Could not save notes. Please export a backup.'); }
   }
 
   seedDemoNotes() {
@@ -470,32 +373,19 @@ class MBNotes {
       {
         id: crypto.randomUUID(),
         title: 'Welcome to mbnotes.online',
-        content: 'A fast, local-first notes app that lives entirely in your browser.<br><br><b>Try these features:</b><br>• Select text → use <b>Bold</b>, <i>Italic</i>, <u>Underline</u> or <s>Strikethrough</s><br>• Link notes with [[Project ideas]]<br>• Add #tags<br>• Paste a URL like https://example.com — it becomes clickable<br>• Attach images & files<br>• Turn any note into a checklist<br>• Bullet & numbered lists<br><br>Everything stays on your device. No account needed.',
-        color: 'bg-amber-100',
-        darkClass: 'note-amber',
-        pinned: true,
-        isChecklist: false,
-        checklistItems: [],
-        attachments: [],
-        tags: ['welcome'],
-        archived: false,
-        trashed: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        content: 'A fast, local-first notes app.<br><br><b>Try these:</b><br>• Bold / Italic / lists<br>• [[Project ideas]] links<br>• #tags<br>• https://example.com becomes clickable<br><br>Notes auto-save.',
+        color: 'bg-amber-100', darkClass: 'note-amber', pinned: true,
+        isChecklist: false, checklistItems: [], attachments: [], tags: ['welcome'],
+        archived: false, trashed: false,
+        createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
       },
       {
         id: crypto.randomUUID(),
         title: 'Project ideas',
-        content: 'A place for things you might build later.<br><br>You can link back to this note from anywhere using [[Project ideas]].',
-        color: 'bg-white',
-        darkClass: 'note-white',
-        pinned: false,
-        isChecklist: false,
-        checklistItems: [],
-        attachments: [],
-        tags: ['ideas'],
-        archived: false,
-        trashed: false,
+        content: 'Link back with [[Project ideas]].',
+        color: 'bg-white', darkClass: 'note-white', pinned: false,
+        isChecklist: false, checklistItems: [], attachments: [], tags: ['ideas'],
+        archived: false, trashed: false,
         createdAt: new Date(Date.now() - 3600000).toISOString(),
         updatedAt: new Date(Date.now() - 3600000).toISOString()
       },
@@ -503,19 +393,14 @@ class MBNotes {
         id: crypto.randomUUID(),
         title: 'Shopping list',
         content: '',
-        color: 'bg-emerald-100',
-        darkClass: 'note-emerald',
-        pinned: false,
+        color: 'bg-emerald-100', darkClass: 'note-emerald', pinned: false,
         isChecklist: true,
         checklistItems: [
           { text: 'Milk', completed: false },
           { text: 'Eggs', completed: true },
           { text: 'Sourdough bread', completed: false }
         ],
-        attachments: [],
-        tags: ['personal'],
-        archived: false,
-        trashed: false,
+        attachments: [], tags: ['personal'], archived: false, trashed: false,
         createdAt: new Date(Date.now() - 7200000).toISOString(),
         updatedAt: new Date(Date.now() - 7200000).toISOString()
       }
@@ -526,12 +411,9 @@ class MBNotes {
 
   colorToDark(color) {
     return {
-      'bg-white': 'note-white',
-      'bg-amber-100': 'note-amber',
-      'bg-emerald-100': 'note-emerald',
-      'bg-sky-100': 'note-sky',
-      'bg-purple-100': 'note-purple',
-      'bg-rose-100': 'note-rose'
+      'bg-white': 'note-white', 'bg-amber-100': 'note-amber',
+      'bg-emerald-100': 'note-emerald', 'bg-sky-100': 'note-sky',
+      'bg-purple-100': 'note-purple', 'bg-rose-100': 'note-rose'
     }[color] || 'note-white';
   }
 
@@ -555,12 +437,90 @@ class MBNotes {
     el.innerHTML = this.redoStack.pop();
   }
 
-  // Critical: focus the editor first so execCommand works
-  runFormat(cmd) {
-    const el = this.editingId ? document.getElementById('e-content') : document.getElementById('c-content');
+  // ========== LIST HELPERS ==========
+  getActiveEditor() {
+    return this.editingId ? document.getElementById('e-content') : document.getElementById('c-content');
+  }
+
+  insertAtCursor(text) {
+    const el = this.getActiveEditor();
     if (!el) return;
     el.focus();
-    document.execCommand(cmd, false, null);
+
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+
+    const textNode = document.createTextNode(text);
+    range.insertNode(textNode);
+
+    // Move cursor after the inserted text
+    range.setStartAfter(textNode);
+    range.setEndAfter(textNode);
+    sel.removeAllRanges();
+    sel.addRange(range);
+
+    this.saveState(el.innerHTML);
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  insertList(type) {
+    const el = this.getActiveEditor();
+    if (!el) return;
+    el.focus();
+
+    if (type === 'bullet') {
+      this.insertAtCursor('• ');
+    } else {
+      this.insertAtCursor('1. ');
+    }
+  }
+
+  // Continue list on Enter
+  handleListEnter(e, el) {
+    if (e.key !== 'Enter' || e.shiftKey) return;
+
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+
+    // Get the text of the current line
+    const range = sel.getRangeAt(0);
+    const preRange = range.cloneRange();
+    preRange.selectNodeContents(el);
+    preRange.setEnd(range.startContainer, range.startOffset);
+    const textBefore = preRange.toString();
+    const lines = textBefore.split('\n');
+    const currentLine = lines[lines.length - 1] || '';
+
+    // Bullet list
+    if (/^•\s/.test(currentLine.trim()) || currentLine.trim() === '•') {
+      e.preventDefault();
+      // If the line is empty (just the bullet), exit the list
+      if (currentLine.trim() === '•' || currentLine.trim() === '• ') {
+        // Remove the bullet and just do a normal newline
+        document.execCommand('insertHTML', false, '<br>');
+      } else {
+        document.execCommand('insertHTML', false, '<br>• ');
+      }
+      this.saveState(el.innerHTML);
+      return;
+    }
+
+    // Numbered list  (1.  2.  3. ...)
+    const numMatch = currentLine.trim().match(/^(\d+)\.\s/);
+    if (numMatch) {
+      e.preventDefault();
+      const nextNum = parseInt(numMatch[1], 10) + 1;
+      // If line is empty (just the number), exit list
+      if (currentLine.trim() === numMatch[0].trim() || currentLine.trim() === numMatch[1] + '.') {
+        document.execCommand('insertHTML', false, '<br>');
+      } else {
+        document.execCommand('insertHTML', false, `<br>${nextNum}. `);
+      }
+      this.saveState(el.innerHTML);
+    }
   }
 
   bindEvents() {
@@ -613,6 +573,13 @@ class MBNotes {
     document.getElementById('e-content').addEventListener('input', scheduleEditSave);
     document.getElementById('e-title').addEventListener('input', scheduleEditSave);
 
+    // List continuation on Enter
+    ['c-content', 'e-content'].forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener('keydown', e => this.handleListEnter(e, el));
+      el.addEventListener('input', () => this.saveState(el.innerHTML));
+    });
+
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') {
         if (this.editingId) this.closeModal();
@@ -623,20 +590,28 @@ class MBNotes {
         else this.closeCapture();
       }
       if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
-        e.preventDefault();
-        this.undo();
+        e.preventDefault(); this.undo();
       }
       if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.shiftKey && e.key === 'Z'))) {
-        e.preventDefault();
-        this.redo();
+        e.preventDefault(); this.redo();
       }
     });
 
-    // Fixed format buttons – focus editor first
+    // Regular format buttons (bold etc)
     document.querySelectorAll('.format-btn').forEach(btn => {
       btn.onclick = (e) => {
         e.preventDefault();
-        this.runFormat(btn.dataset.cmd);
+        const el = this.getActiveEditor();
+        if (el) el.focus();
+        document.execCommand(btn.dataset.cmd, false, null);
+      };
+    });
+
+    // List buttons – reliable insertion
+    document.querySelectorAll('.list-btn').forEach(btn => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        this.insertList(btn.dataset.type);
       };
     });
 
@@ -683,11 +658,6 @@ class MBNotes {
 
     document.getElementById('share-btn').onclick = () => this.shareNote();
     document.getElementById('modal').onclick = e => { if (e.target.id === 'modal') this.closeModal(); };
-
-    ['c-content', 'e-content'].forEach(id => {
-      const el = document.getElementById(id);
-      el.addEventListener('input', () => this.saveState(el.innerHTML));
-    });
   }
 
   expandCapture() {
@@ -719,8 +689,7 @@ class MBNotes {
         checklistItems: items,
         attachments: [...this.captureAttachments],
         tags: this.extractTags(title + ' ' + content.replace(/<[^>]+>/g, '')),
-        archived: false,
-        trashed: false,
+        archived: false, trashed: false,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -831,10 +800,7 @@ class MBNotes {
     if (newIndex < 0 || newIndex >= items.length) return;
     [items[index], items[newIndex]] = [items[newIndex], items[index]];
     if (mode === 'capture') this.renderCaptureChecklist();
-    else {
-      this.renderEditChecklist();
-      this.autoSaveEdit();
-    }
+    else { this.renderEditChecklist(); this.autoSaveEdit(); }
   }
 
   renderCaptureChecklist() {
@@ -975,18 +941,15 @@ class MBNotes {
 
   formatContent(html) {
     let out = html || '';
-
     out = out.replace(/\[\[([^\]]+)\]\]/g, (_, title) => {
       const target = this.notes.find(n => n.title === title && !n.trashed);
       return target
         ? `<span class="note-link" onclick="event.stopPropagation(); app.openNote('${target.id}')">${this.escape(title)}</span>`
         : `<span class="note-link opacity-60">[[${this.escape(title)}]]</span>`;
     });
-
     out = out.replace(/(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/g, (url) => {
       return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="url-link" onclick="event.stopPropagation()">${this.escape(url)}</a>`;
     });
-
     return out;
   }
 
@@ -1114,7 +1077,6 @@ class MBNotes {
     if (this.filter === 'all' && !this.query) {
       const pinned = list.filter(n => n.pinned);
       const others = list.filter(n => !n.pinned);
-
       let html = '';
       if (pinned.length) {
         html += `<div class="mb-6"><div class="section-label">Pinned</div><div class="masonry">${pinned.map(n => this.renderNoteCard(n)).join('')}</div></div>`;
@@ -1146,9 +1108,7 @@ class MBNotes {
       this.notes = data;
       this.persist();
       this.render();
-    } catch {
-      alert('Could not read that file.');
-    }
+    } catch { alert('Could not read that file.'); }
     e.target.value = '';
   }
 }
