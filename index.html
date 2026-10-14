@@ -1,1120 +1,322 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light" data-app-short="Notes" data-app-domain="mbnotes.online">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#f59e0b">
-  <meta name="description" content="mbnotes.online – fast local-first notes">
-  <title>mbnotes.online</title>
-  
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23f59e0b'/><text y='.9em' font-size='70' x='12' fill='white' font-family='system-ui'>MB</text></svg>">
-
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    body { font-family: 'Inter', system-ui, sans-serif; }
-    .masonry { column-count: 1; column-gap: 1rem; }
-    @media (min-width: 640px) { .masonry { column-count: 2; } }
-    @media (min-width: 1024px) { .masonry { column-count: 3; } }
-    @media (min-width: 1400px) { .masonry { column-count: 4; } }
-    .masonry-item { break-inside: avoid; margin-bottom: 1rem; }
-
-    .note-link, .url-link {
-      display: inline;
-      padding: 0.1em 0.4em;
-      margin: 0 0.05em;
-      border-radius: 0.3em;
-      font-weight: 500;
-      font-size: 0.92em;
-      cursor: pointer;
-      word-break: break-all;
-      overflow-wrap: anywhere;
-      max-width: 100%;
-    }
-    .note-link { background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; }
-    .note-link:hover { background: #fde68a; }
-    .url-link { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; text-decoration: none; }
-    .url-link:hover { background: #bae6fd; }
-
-    .note-actions {
-      opacity: 0; transform: scale(0.95);
-      transition: opacity 0.15s, transform 0.15s;
-      background: #ffffff; border: 1px solid #e5e7eb;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    }
-    .note-card:hover .note-actions, .note-card:focus-within .note-actions {
-      opacity: 1; transform: scale(1);
-    }
-    .dark .note-actions { background: #1e293b; border-color: #334155; }
-
-    .attachment-chip { background: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
-    .dark .attachment-chip { background: #334155; color: #e2e8f0; border-color: #475569; }
-
-    .dark body, .dark { background: #0f172a; color: #e2e8f0; }
-    .dark .bg-white { background: #1e293b !important; }
-    .dark .bg-gray-50 { background: #0f172a !important; }
-    .dark .bg-gray-100 { background: #334155 !important; }
-    .dark .border-gray-200, .dark .border-gray-100 { border-color: #334155 !important; }
-    .dark .text-gray-800, .dark .text-gray-900 { color: #f1f5f9 !important; }
-    .dark .text-gray-700 { color: #cbd5e1 !important; }
-    .dark .text-gray-600 { color: #94a3b8 !important; }
-    .dark .text-gray-500, .dark .text-gray-400 { color: #64748b !important; }
-
-    .dark input:not(.note-input),
-    .dark textarea:not(.note-input),
-    .dark [contenteditable]:not(.note-content) {
-      background: #1e293b !important; color: #f1f5f9 !important; border-color: #334155 !important;
-    }
-    .dark input::placeholder, .dark textarea::placeholder { color: #64748b !important; }
-
-    .dark .note-amber { background: #78350f !important; color: #fef3c7 !important; }
-    .dark .note-emerald { background: #064e3b !important; color: #d1fae5 !important; }
-    .dark .note-sky { background: #0c4a6e !important; color: #e0f2fe !important; }
-    .dark .note-purple { background: #4c1d95 !important; color: #ede9fe !important; }
-    .dark .note-rose { background: #9f1239 !important; color: #ffe4e6 !important; }
-    .dark .note-white { background: #1e293b !important; color: #e2e8f0 !important; }
-
-    .dark .note-amber *, .dark .note-emerald *, .dark .note-sky *,
-    .dark .note-purple *, .dark .note-rose *, .dark .note-white * {
-      color: inherit !important;
-    }
-    .dark .note-amber input, .dark .note-amber [contenteditable],
-    .dark .note-emerald input, .dark .note-emerald [contenteditable],
-    .dark .note-sky input, .dark .note-sky [contenteditable],
-    .dark .note-purple input, .dark .note-purple [contenteditable],
-    .dark .note-rose input, .dark .note-rose [contenteditable],
-    .dark .note-white input, .dark .note-white [contenteditable] {
-      background: transparent !important; color: inherit !important;
-    }
-
-    .dark .note-link { background: #92400e; color: #fde68a; border-color: #b45309; }
-    .dark .url-link { background: #0c4a6e; color: #7dd3fc; border-color: #0284c7; }
-
-    #search { background: #e5e7eb !important; border: 1px solid #d1d5db; }
-    .dark #search { background: #1e293b !important; border: 1px solid #475569; color: #f1f5f9 !important; }
-    #search:focus { background: #ffffff !important; border-color: #f59e0b; }
-    .dark #search:focus { background: #0f172a !important; border-color: #f59e0b; }
-
-    .theme-switch {
-      position: relative; width: 44px; height: 24px;
-      background: #d1d5db; border-radius: 9999px; cursor: pointer; transition: background 0.2s;
-    }
-    .theme-switch::after {
-      content: ''; position: absolute; top: 2px; left: 2px;
-      width: 20px; height: 20px; background: white; border-radius: 50%;
-      transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-    }
-    .dark .theme-switch { background: #f59e0b; }
-    .dark .theme-switch::after { transform: translateX(20px); }
-
-    [contenteditable] {
-      min-height: 60px; outline: none; line-height: 1.5;
-      word-break: break-word; overflow-wrap: anywhere;
-    }
-    [contenteditable]:empty:before {
-      content: attr(data-placeholder); color: #9ca3af; pointer-events: none;
-    }
-    .dark [contenteditable]:empty:before { color: #64748b; }
-
-    @media (max-width: 640px) {
-      #c-controls, .sticky-controls {
-        position: sticky; bottom: 0; z-index: 10;
-        box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
-      }
-    }
-
-    .section-label {
-      font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.05em; color: #9ca3af; margin-bottom: 0.75rem; padding-left: 0.25rem;
-    }
-
-    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>Notes | All notes</title>
+<meta name="description" content="Free notes app that runs in your browser. Write notes and checklists, pin, tag and link them, and import from Google Keep. No account; your notes stay on your device.">
+<link rel="canonical" href="https://mbnotes.online/">
+<meta name="theme-color" content="#EAB308">
+<meta name="color-scheme" content="light dark">
+<meta name="application-name" content="Notes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Notes">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="mbnotes.online">
+<meta property="og:title" content="mbnotes.online · Free notes and checklists in your browser">
+<meta property="og:description" content="Write notes and checklists, pin, tag and link them, and import from Google Keep. No account; your notes stay on your device.">
+<meta property="og:url" content="https://mbnotes.online/">
+<meta property="og:image" content="https://mbnotes.online/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="mbnotes.online: notes and checklists that stay on your device, shown in the app">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="mbnotes.online · Free notes and checklists in your browser">
+<meta name="twitter:description" content="Write notes and checklists, pin, tag and link them, and import from Google Keep. No account; your notes stay on your device.">
+<meta name="twitter:image" content="https://mbnotes.online/og-image.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"mbnotes.online","alternateName":"Notes","url":"https://mbnotes.online/","applicationCategory":"ProductivityApplication","operatingSystem":"Any (runs in a web browser)","description":"Free notes app that runs in your browser. Write notes and checklists, pin, tag and link them, and import from Google Keep. No account; notes stay on your device.","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Matthew Broyer","url":"https://matthewbroyer.com/"}}</script>
+<script src="theme-boot.js"></script>
+<link rel="stylesheet" href="mb-suite-core.css">
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="mb-suite-cutouts.css">
+<link rel="stylesheet" href="mb-suite-sidebar.css">
+<link rel="stylesheet" href="mb-suite-v3.css">
+<link rel="stylesheet" href="app-v3.css">
 </head>
-<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+<body class="mb-shell">
+<a class="skip" href="#main">Skip to notes</a>
+<noscript><p style="margin:0;padding:12px 16px;background:#fdf3cd;color:#1b1f24">mbnotes.online is a free notes app that runs in your browser: notes and checklists with tags, links between notes and Google Keep import, saved on your device. It needs JavaScript turned on.</p></noscript>
 
-  <header class="bg-white border-b sticky top-0 z-40 px-3 py-2.5 flex items-center gap-3 shadow-sm">
-    <button id="sidebar-toggle" class="md:hidden p-2.5 text-gray-500 hover:bg-gray-100 rounded-lg">
-      <i class="fa-solid fa-bars"></i>
-    </button>
-    <div class="flex items-center gap-2 shrink-0">
-      <div class="bg-amber-500 text-white w-9 h-9 rounded-xl flex items-center justify-center shadow">
-        <i class="fa-solid fa-feather"></i>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-notes" viewBox="0 0 24 24"><path d="M6 3.5h9l4 4v13H6z"/><path d="M15 3.5v4h4M9 12h7M9 16h5"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M9 3.5h6M10 3.5v6l-3 4h10l-3-4v-6M12 13.5V21"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="m8 12 3 3 5-6"/></symbol>
+  <symbol id="i-archive" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="5" rx="1.5"/><path d="M5 9v10.5h14V9M10 13h4"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 3.5h4M6.5 7l1 13h9l1-13M10 11v6M14 11v6"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3.5 12.2V4.5a1 1 0 0 1 1-1h7.7l8.3 8.3a1.4 1.4 0 0 1 0 2l-6.2 6.2a1.4 1.4 0 0 1-2 0z"/><circle cx="8.5" cy="8.5" r="1.4"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-export" viewBox="0 0 24 24"><path d="M4 14v5.5h16V14M12 15V4M7.5 8.5 12 4l4.5 4.5"/></symbol>
+  <symbol id="i-import" viewBox="0 0 24 24"><path d="M4 14v5.5h16V14M12 4v11M7.5 10.5 12 15l4.5-4.5"/></symbol>
+  <symbol id="i-data" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7.5" ry="2.8"/><path d="M4.5 6v12c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8V6M4.5 12c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8"/></symbol>
+  <symbol id="i-bold" viewBox="0 0 24 24"><path d="M7 4.5h6a3.5 3.5 0 0 1 0 7H7zM7 11.5h7a3.75 3.75 0 0 1 0 7.5H7z"/></symbol>
+  <symbol id="i-italic" viewBox="0 0 24 24"><path d="M10 4.5h8M6 19.5h8M14.5 4.5l-5 15"/></symbol>
+  <symbol id="i-underline" viewBox="0 0 24 24"><path d="M7 4v7a5 5 0 0 0 10 0V4M5 20h14"/></symbol>
+  <symbol id="i-strike" viewBox="0 0 24 24"><path d="M4 12h16M16.5 6.5C15.6 5 14 4.3 12 4.3c-2.8 0-4.5 1.4-4.5 3.4 0 1.6 1 2.6 3 3.3M7.5 17.5c1 1.4 2.6 2.2 4.6 2.2 2.8 0 4.6-1.4 4.6-3.6 0-.8-.2-1.5-.7-2.1"/></symbol>
+  <symbol id="i-ul" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1" fill="currentColor"/><circle cx="4.5" cy="12" r="1" fill="currentColor"/><circle cx="4.5" cy="18" r="1" fill="currentColor"/></symbol>
+  <symbol id="i-ol" viewBox="0 0 24 24"><path d="M10 6h10M10 12h10M10 18h10M4 4.5h1.5V9M4 9h3M4 14.5c.4-.6 1-.9 1.6-.9.9 0 1.4.6 1.4 1.2 0 1.2-3 2.2-3 3.7h3"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol>
+  <symbol id="i-redo" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></symbol>
+  <symbol id="i-clip" viewBox="0 0 24 24"><path d="m20 11.5-8.2 8.2a5 5 0 0 1-7.1-7.1l8.5-8.5a3.3 3.3 0 0 1 4.7 4.7l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5.5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="18.5" r="2.5"/><path d="m8.2 10.8 7.6-4.1M8.2 13.2l7.6 4.1"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="m6 15 6-6 6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-restore" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.5"/><path d="M4 4v4.5h4.5"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 3.5h8l4 4v13H6z"/><path d="M14 3.5v4h4"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.8M12 17.3v.2"/></symbol>
+  <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3.5c3 3.6 6 7 6 10.5a6 6 0 0 1-12 0c0-3.5 3-6.9 6-10.5z"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+</svg>
+
+<aside class="mb-side" aria-label="App">
+  <a class="brand" href="./" data-action="home" aria-label="mbnotes.online: go to All notes"><span class="logo"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="gn1" gradientUnits="userSpaceOnUse" x1="10" y1="0" x2="54" y2="64"><stop offset="0" stop-color="#edbe2b"/><stop offset=".55" stop-color="#EAB308"/><stop offset="1" stop-color="#bb8f06"/></linearGradient><clipPath id="cn1"><rect width="64" height="64" rx="18"/></clipPath></defs><g clip-path="url(#cn1)"><rect width="64" height="64" fill="url(#gn1)"/><path d="M24 26.5h16M24 33.5h16M24 40.5h9" stroke="#fff" stroke-opacity=".55" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M17.5 14.5h21.5l7.5 7.5v27.5h-29z" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M39 14.5v7.5h7.5" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></svg></span><span class="bt"><b>mbnotes<i class="tld">.online</i></b><span>Official Web App · v1.0</span></span></a>
+  <nav class="side-nav" id="sideNav" aria-label="Sections">
+    <button type="button" data-view="all" aria-current="page"><svg class="uic"><use href="#i-notes"/></svg><span>All notes</span><b class="count" data-count="all"></b></button>
+    <button type="button" data-view="pinned"><svg class="uic"><use href="#i-pin"/></svg><span>Pinned</span><b class="count" data-count="pinned"></b></button>
+    <button type="button" data-view="checklist"><svg class="uic"><use href="#i-check"/></svg><span>Checklists</span><b class="count" data-count="checklist"></b></button>
+    <button type="button" data-view="archive"><svg class="uic"><use href="#i-archive"/></svg><span>Archive</span><b class="count" data-count="archive"></b></button>
+    <button type="button" data-view="trash"><svg class="uic"><use href="#i-trash"/></svg><span>Trash</span><b class="count" data-count="trash"></b></button>
+  </nav>
+  <p class="side-label" id="tagLabel" hidden>Tags</p>
+  <nav class="side-nav side-tags" id="tagNav" aria-labelledby="tagLabel"></nav>
+  <nav class="side-nav side-end" aria-label="More">
+    <button type="button" data-view="settings"><svg class="uic"><use href="#i-settings"/></svg><span>Settings</span></button>
+  </nav>
+</aside>
+
+<div class="mb-main">
+  <header class="page-bar">
+    <a class="brand phone-brand" href="./" data-action="home" aria-label="mbnotes.online: go to All notes"><span class="logo"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="gn2" gradientUnits="userSpaceOnUse" x1="10" y1="0" x2="54" y2="64"><stop offset="0" stop-color="#edbe2b"/><stop offset=".55" stop-color="#EAB308"/><stop offset="1" stop-color="#bb8f06"/></linearGradient><clipPath id="cn2"><rect width="64" height="64" rx="18"/></clipPath></defs><g clip-path="url(#cn2)"><rect width="64" height="64" fill="url(#gn2)"/><path d="M24 26.5h16M24 33.5h16M24 40.5h9" stroke="#fff" stroke-opacity=".55" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M17.5 14.5h21.5l7.5 7.5v27.5h-29z" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M39 14.5v7.5h7.5" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></svg></span><span class="bt"><b>mbnotes<i class="tld">.online</i></b><span>Official Web App · v1.0</span></span></a>
+    <h1 class="page-title" id="pageTitle">All notes</h1>
+    <div class="actions">
+      <div class="searchbox hide-phone" data-notes-only>
+        <svg class="uic" aria-hidden="true"><use href="#i-search"/></svg>
+        <input id="search" type="search" placeholder="Search notes" aria-label="Search notes" autocomplete="off">
       </div>
-      <div class="hidden sm:block">
-        <div class="font-bold text-lg tracking-tight leading-none">mbnotes.online</div>
-        <div class="text-[11px] text-gray-400 font-medium">Alpha Release · v1.1</div>
+      <div class="menu-wrap hide-phone">
+        <button type="button" class="btn sm" id="dataBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="dataMenu"><svg class="uic" aria-hidden="true"><use href="#i-data"/></svg><span>Data</span></button>
+        <div class="menu" id="dataMenu" role="menu" hidden>
+          <button type="button" role="menuitem" data-action="export"><svg class="uic" aria-hidden="true"><use href="#i-export"/></svg>Export backup (.json)</button>
+          <button type="button" role="menuitem" data-action="import"><svg class="uic" aria-hidden="true"><use href="#i-import"/></svg>Import backup…</button>
+          <button type="button" role="menuitem" data-action="keep"><svg class="uic" aria-hidden="true"><use href="#i-import"/></svg>Import from Google Keep…</button>
+        </div>
       </div>
-    </div>
-
-    <div class="flex-1 max-w-2xl relative">
-      <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></i>
-      <input id="search" type="search" placeholder="Search notes…" 
-             class="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none">
-    </div>
-
-    <div class="flex items-center gap-3">
-      <button id="theme-toggle" class="theme-switch" title="Toggle dark mode"></button>
-      <button onclick="app.exportJSON()" class="p-2.5 text-gray-600 hover:bg-gray-100 rounded-lg" title="Export backup">
-        <i class="fa-solid fa-download"></i>
-      </button>
-      <label class="p-2.5 text-gray-600 hover:bg-gray-100 rounded-lg cursor-pointer" title="Import backup">
-        <i class="fa-solid fa-upload"></i>
-        <input type="file" accept=".json" class="hidden" onchange="app.importJSON(event)">
-      </label>
+      <button type="button" class="themesw" id="themeBtn" role="switch" aria-checked="false" aria-label="Dark mode" title="Dark mode"><i></i></button>
+      <button type="button" class="btn primary sm" data-action="new" aria-label="New note"><svg class="uic" aria-hidden="true"><use href="#i-plus"/></svg><span>New note</span></button>
     </div>
   </header>
 
-  <div class="flex flex-1 overflow-hidden">
-    <aside id="sidebar" class="w-60 bg-white border-r flex flex-col absolute inset-y-0 left-0 z-30 transform -translate-x-full md:static md:translate-x-0 transition-transform pt-14 md:pt-0">
-      <nav class="p-3 space-y-1 flex-1 overflow-y-auto">
-        <button data-filter="all" class="nav-btn active w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium">
-          <i class="fa-solid fa-lightbulb w-5 text-center"></i> All Notes
-        </button>
-        <button data-filter="pinned" class="nav-btn w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100">
-          <i class="fa-solid fa-thumbtack w-5 text-center"></i> Pinned
-        </button>
-        <button data-filter="checklist" class="nav-btn w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100">
-          <i class="fa-solid fa-square-check w-5 text-center"></i> Checklists
-        </button>
-        <button data-filter="archive" class="nav-btn w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100">
-          <i class="fa-solid fa-box-archive w-5 text-center"></i> Archive
-        </button>
-        <button data-filter="trash" class="nav-btn w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100">
-          <i class="fa-solid fa-trash w-5 text-center"></i> Trash
-        </button>
-        <div class="pt-5">
-          <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Tags</p>
-          <div id="tag-list" class="space-y-0.5"></div>
+  <main class="wrap" id="main" tabindex="-1">
+    <!-- NOTES VIEWS (all / pinned / checklist / archive / trash / tag) -->
+    <section id="notesView" aria-labelledby="viewHeading">
+      <section class="cu-banner" id="homeBanner">
+        <svg class="cu-art" viewBox="0 0 640 136" preserveAspectRatio="xMaxYMax slice" aria-hidden="true" focusable="false"><circle class="b" cx="560" cy="46" r="26"/><path class="s" d="M210 150 C315 80 525 80 630 150Z"/><path class="m" d="M410 150 C485 66 635 66 710 150Z"/><path class="d" d="M530 150 C585 90 695 90 750 150Z"/><path class="n" transform="translate(470 98) rotate(-64) scale(0.5)" d="M0 0 C 20 -34 66 -40 96 -6 C 70 28 22 34 0 0Z"/><path class="d" transform="translate(480 98) rotate(-116) scale(0.4)" d="M0 0 C 20 -34 66 -40 96 -6 C 70 28 22 34 0 0Z"/><circle class="r" cx="360" cy="44" r="6"/></svg>
+        <div class="cu-txt"><h2 class="cu-t" id="bannerTitle">All notes</h2><p class="cu-s" id="bannerSub">Your notes stay in this browser</p></div>
+      </section>
+      <div class="view-head" id="viewHead" hidden>
+        <h2 id="viewHeading">All notes</h2>
+        <p class="view-sub" id="viewSub"></p>
+        <div class="view-actions" id="viewActions"></div>
+      </div>
+
+      <div class="phone-tools">
+        <div class="searchbox">
+          <svg class="uic" aria-hidden="true"><use href="#i-search"/></svg>
+          <input id="searchPhone" type="search" placeholder="Search notes" aria-label="Search notes" autocomplete="off">
         </div>
-      </nav>
-      <div class="p-3 border-t text-[11px] text-gray-400 text-center">Local-first • No account needed</div>
-    </aside>
+        <div class="chiprow" id="phoneChips" aria-label="Filters"></div>
+      </div>
 
-    <div id="sidebar-backdrop" class="fixed inset-0 bg-black/40 z-20 hidden md:hidden"></div>
-
-    <main class="flex-1 overflow-y-auto p-4 md:p-6">
-      <div id="capture" class="max-w-2xl mx-auto mb-8 bg-white rounded-2xl border shadow-sm transition-all">
-        <div class="p-4">
-          <input id="c-title" placeholder="Title (optional)" class="w-full font-semibold text-gray-900 placeholder-gray-400 outline-none mb-2 hidden">
-          
-          <div id="c-format-bar" class="hidden flex items-center gap-1 mb-2 pb-2 border-b border-gray-100 flex-wrap">
-            <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="bold" title="Bold"><i class="fa-solid fa-bold text-sm"></i></button>
-            <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="italic" title="Italic"><i class="fa-solid fa-italic text-sm"></i></button>
-            <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="underline" title="Underline"><i class="fa-solid fa-underline text-sm"></i></button>
-            <button class="format-btn p-1.5 rounded hover:bg-gray-100" data-cmd="strikeThrough" title="Strikethrough"><i class="fa-solid fa-strikethrough text-sm"></i></button>
-            <div class="w-px h-4 bg-gray-200 mx-1"></div>
-            <button class="list-btn p-1.5 rounded hover:bg-gray-100" data-type="bullet" title="Bullet list"><i class="fa-solid fa-list-ul text-sm"></i></button>
-            <button class="list-btn p-1.5 rounded hover:bg-gray-100" data-type="number" title="Numbered list"><i class="fa-solid fa-list-ol text-sm"></i></button>
-            <div class="w-px h-4 bg-gray-200 mx-1"></div>
-            <button onclick="app.undo()" class="p-1.5 rounded hover:bg-gray-100" title="Undo"><i class="fa-solid fa-rotate-left text-sm"></i></button>
-            <button onclick="app.redo()" class="p-1.5 rounded hover:bg-gray-100" title="Redo"><i class="fa-solid fa-rotate-right text-sm"></i></button>
+      <!-- capture -->
+      <div id="capture" class="capture note-c bg-white" data-open="false">
+        <div class="cap-body">
+          <label class="sr" for="c-title">Title</label>
+          <input id="c-title" class="cap-title" placeholder="Title" autocomplete="off" hidden>
+          <div class="fmt" id="c-format-bar" role="toolbar" aria-label="Formatting" hidden>
+            <button type="button" class="ib" data-cmd="bold" aria-label="Bold" title="Bold (Ctrl+B)"><svg class="uic"><use href="#i-bold"/></svg></button>
+            <button type="button" class="ib" data-cmd="italic" aria-label="Italic" title="Italic (Ctrl+I)"><svg class="uic"><use href="#i-italic"/></svg></button>
+            <button type="button" class="ib" data-cmd="underline" aria-label="Underline" title="Underline (Ctrl+U)"><svg class="uic"><use href="#i-underline"/></svg></button>
+            <button type="button" class="ib" data-cmd="strikeThrough" aria-label="Strikethrough" title="Strikethrough"><svg class="uic"><use href="#i-strike"/></svg></button>
+            <span class="sep" aria-hidden="true"></span>
+            <button type="button" class="ib" data-list="bullet" aria-label="Bullet list" title="Bullet list"><svg class="uic"><use href="#i-ul"/></svg></button>
+            <button type="button" class="ib" data-list="number" aria-label="Numbered list" title="Numbered list"><svg class="uic"><use href="#i-ol"/></svg></button>
+            <span class="sep" aria-hidden="true"></span>
+            <button type="button" class="ib" data-cmd="undo" aria-label="Undo" title="Undo (Ctrl+Z)"><svg class="uic"><use href="#i-undo"/></svg></button>
+            <button type="button" class="ib" data-cmd="redo" aria-label="Redo" title="Redo (Ctrl+Y)"><svg class="uic"><use href="#i-redo"/></svg></button>
           </div>
-
-          <div id="c-content" contenteditable="true" 
-               class="w-full text-sm text-gray-700 outline-none min-h-[42px]"
-               data-placeholder="Write a note…  #tags  [[links]]  https://…"></div>
-          
-          <div id="c-attachments" class="flex flex-wrap gap-2 mt-3 hidden"></div>
-          <div id="c-checklist" class="hidden mt-3 space-y-1.5"></div>
+          <div id="c-content" class="editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Write a note"
+               data-placeholder="Write a note…  #tags  [[links to other notes]]  https://links"></div>
+          <div id="c-attachments" class="atts" hidden></div>
+          <div id="c-checklist" class="cl-edit" hidden></div>
         </div>
-        
-        <div id="c-controls" class="hidden px-4 py-2.5 bg-gray-50 border-t rounded-b-2xl flex items-center justify-between">
-          <div class="flex items-center gap-1">
-            <div class="flex gap-1.5 mr-2">
-              <button data-color="bg-white" data-dark="note-white" class="color-btn w-6 h-6 rounded-full bg-white border border-gray-300"></button>
-              <button data-color="bg-amber-100" data-dark="note-amber" class="color-btn w-6 h-6 rounded-full bg-amber-200 border border-amber-300"></button>
-              <button data-color="bg-emerald-100" data-dark="note-emerald" class="color-btn w-6 h-6 rounded-full bg-emerald-200 border border-emerald-300"></button>
-              <button data-color="bg-sky-100" data-dark="note-sky" class="color-btn w-6 h-6 rounded-full bg-sky-200 border border-sky-300"></button>
-              <button data-color="bg-purple-100" data-dark="note-purple" class="color-btn w-6 h-6 rounded-full bg-purple-200 border border-purple-300"></button>
-              <button data-color="bg-rose-100" data-dark="note-rose" class="color-btn w-6 h-6 rounded-full bg-rose-200 border border-rose-300"></button>
-            </div>
-            <button id="toggle-checklist" class="p-2 text-gray-600 hover:bg-gray-200 rounded-lg" title="Checklist"><i class="fa-solid fa-square-check"></i></button>
-            <label class="p-2 text-gray-600 hover:bg-gray-200 rounded-lg cursor-pointer" title="Attach file">
-              <i class="fa-solid fa-paperclip"></i>
-              <input type="file" class="hidden" multiple accept="image/*,.pdf,.txt,.md,.doc,.docx,.zip" onchange="app.handleFiles(event, 'capture')">
+        <div class="cap-bar" id="c-controls" hidden>
+          <div class="tools">
+            <div class="swatches" role="group" aria-label="Note color" data-swatches="capture"></div>
+            <button type="button" class="ib" id="toggle-checklist" aria-pressed="false" aria-label="Checklist" title="Checklist"><svg class="uic"><use href="#i-check"/></svg></button>
+            <label class="ib" title="Attach a file (4 MB max)"><svg class="uic" aria-hidden="true"><use href="#i-clip"/></svg><span class="sr">Attach a file</span>
+              <input type="file" class="sr" multiple accept="image/*,.pdf,.txt,.md,.doc,.docx,.zip" data-files="capture">
             </label>
           </div>
-          <div class="text-xs text-gray-400">Auto-saves • Esc to close</div>
+          <span class="hint hide-phone">Saves when you close · Esc</span>
+          <button type="button" class="btn sm" data-action="close-capture">Close</button>
         </div>
       </div>
 
-      <div class="max-w-6xl mx-auto">
-        <div id="notes"></div>
-        <div id="empty" class="hidden text-center py-20 text-gray-400">
-          <div class="text-5xl mb-4 opacity-40"><i class="fa-solid fa-pen-to-square"></i></div>
-          <p class="font-medium text-gray-600">No notes yet</p>
-          <p class="text-sm mt-2 max-w-xs mx-auto">Type above — notes auto-save.</p>
-          <button onclick="app.seedDemoNotes()" class="mt-6 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-xl">
-            Load demo notes
-          </button>
-        </div>
-      </div>
-    </main>
-  </div>
+      <div id="notes" aria-live="polite"></div>
+      <div id="empty" class="empty" hidden></div>
+    </section>
 
-  <div id="modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-    <div id="modal-card" class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col">
-      <div class="p-5 flex-1 overflow-y-auto">
-        <input id="e-title" class="note-input w-full font-bold text-lg outline-none border-b pb-2 mb-3 bg-transparent" placeholder="Title">
-        
-        <div class="flex items-center gap-1 mb-2 pb-2 border-b border-black/10 flex-wrap">
-          <button class="format-btn p-1.5 rounded hover:bg-black/5" data-cmd="bold" title="Bold"><i class="fa-solid fa-bold text-sm"></i></button>
-          <button class="format-btn p-1.5 rounded hover:bg-black/5" data-cmd="italic" title="Italic"><i class="fa-solid fa-italic text-sm"></i></button>
-          <button class="format-btn p-1.5 rounded hover:bg-black/5" data-cmd="underline" title="Underline"><i class="fa-solid fa-underline text-sm"></i></button>
-          <button class="format-btn p-1.5 rounded hover:bg-black/5" data-cmd="strikeThrough" title="Strikethrough"><i class="fa-solid fa-strikethrough text-sm"></i></button>
-          <div class="w-px h-4 bg-black/20 mx-1"></div>
-          <button class="list-btn p-1.5 rounded hover:bg-black/5" data-type="bullet" title="Bullet list"><i class="fa-solid fa-list-ul text-sm"></i></button>
-          <button class="list-btn p-1.5 rounded hover:bg-black/5" data-type="number" title="Numbered list"><i class="fa-solid fa-list-ol text-sm"></i></button>
-          <div class="w-px h-4 bg-black/20 mx-1"></div>
-          <button onclick="app.undo()" class="p-1.5 rounded hover:bg-black/5" title="Undo"><i class="fa-solid fa-rotate-left text-sm"></i></button>
-          <button onclick="app.redo()" class="p-1.5 rounded hover:bg-black/5" title="Redo"><i class="fa-solid fa-rotate-right text-sm"></i></button>
-        </div>
-
-        <div id="e-content" contenteditable="true" 
-             class="note-content w-full text-sm outline-none min-h-[100px] mb-3 bg-transparent"
-             data-placeholder="Write something…"></div>
-        
-        <div id="e-attachments" class="flex flex-wrap gap-2 mb-3"></div>
-        <div id="e-checklist" class="space-y-1.5 mb-4 hidden"></div>
-
-        <div id="backlinks" class="hidden mb-4 pt-3 border-t border-black/10">
-          <p class="text-xs font-semibold opacity-60 uppercase mb-2">Linked from</p>
-          <div id="backlinks-list" class="flex flex-wrap gap-1.5"></div>
-        </div>
-      </div>
-
-      <div class="sticky-controls px-5 py-3 border-t border-black/10 flex items-center justify-between gap-2 flex-wrap bg-inherit">
-        <div class="flex items-center gap-1">
-          <div class="flex gap-1.5">
-            <button data-ecolor="bg-white" data-edark="note-white" class="ecolor-btn w-6 h-6 rounded-full bg-white border border-gray-300"></button>
-            <button data-ecolor="bg-amber-100" data-edark="note-amber" class="ecolor-btn w-6 h-6 rounded-full bg-amber-200 border border-amber-300"></button>
-            <button data-ecolor="bg-emerald-100" data-edark="note-emerald" class="ecolor-btn w-6 h-6 rounded-full bg-emerald-200 border border-emerald-300"></button>
-            <button data-ecolor="bg-sky-100" data-edark="note-sky" class="ecolor-btn w-6 h-6 rounded-full bg-sky-200 border border-sky-300"></button>
-            <button data-ecolor="bg-purple-100" data-edark="note-purple" class="ecolor-btn w-6 h-6 rounded-full bg-purple-200 border border-purple-300"></button>
-            <button data-ecolor="bg-rose-100" data-edark="note-rose" class="ecolor-btn w-6 h-6 rounded-full bg-rose-200 border border-rose-300"></button>
+    <!-- SETTINGS -->
+    <section id="settingsView" hidden aria-labelledby="settingsHeading">
+      <div class="view-head"><h2 id="settingsHeading" class="phone-only">Settings</h2></div>
+      <div class="settings">
+        <section class="card" aria-labelledby="s-data">
+          <h2 id="s-data">Backup and import</h2>
+          <p class="muted">Your notes live only in this browser. Export a backup now and then, especially before clearing browser data or switching devices.</p>
+          <div class="row-actions">
+            <button type="button" class="btn primary" data-action="export"><svg class="uic" aria-hidden="true"><use href="#i-export"/></svg>Export backup</button>
+            <button type="button" class="btn" data-action="import"><svg class="uic" aria-hidden="true"><use href="#i-import"/></svg>Import backup…</button>
           </div>
-          <button id="e-toggle-checklist" class="p-2 opacity-70 hover:opacity-100 rounded-lg" title="Convert to checklist"><i class="fa-solid fa-square-check"></i></button>
-          <label class="p-2 opacity-70 hover:opacity-100 rounded-lg cursor-pointer" title="Attach file">
-            <i class="fa-solid fa-paperclip"></i>
-            <input type="file" class="hidden" multiple accept="image/*,.pdf,.txt,.md,.doc,.docx,.zip" onchange="app.handleFiles(event, 'edit')">
-          </label>
-          <button id="share-btn" class="p-2 opacity-70 hover:opacity-100 rounded-lg" title="Share note"><i class="fa-solid fa-share-nodes"></i></button>
-        </div>
-        <div class="text-xs opacity-50">Auto-saves • Esc to close</div>
+          <p class="fine" id="lastBackup"></p>
+        </section>
+
+        <section class="card" aria-labelledby="s-keep" id="keepCard">
+          <h2 id="s-keep">Import from Google Keep</h2>
+          <ol class="steps">
+            <li>Go to <b>takeout.google.com</b>, click <b>Deselect all</b>, tick <b>Keep</b> only, and create the export.</li>
+            <li>Download the .zip Google emails you.</li>
+            <li>Choose that .zip here (or the .json files from its <b>Takeout/Keep</b> folder).</li>
+          </ol>
+          <label class="check"><input type="checkbox" id="keepImages" checked> Bring in images (up to 4 MB each; they use browser storage)</label>
+          <div class="row-actions">
+            <button type="button" class="btn primary" data-action="keep"><svg class="uic" aria-hidden="true"><use href="#i-import"/></svg>Choose Takeout file…</button>
+          </div>
+          <p class="fine">Keeps titles, text, checklists, colors, pins, archive and trash, labels (as #tags), links and dates. Notes you've already imported are skipped. Everything is read on your device; nothing is uploaded.</p>
+          <div id="keepResult" class="result" role="status" hidden></div>
+        </section>
+
+        <section class="card" aria-labelledby="s-app">
+          <h2 id="s-app">App</h2>
+          <div data-mb-install data-app-name="Notes" data-note="Opens in its own window with its own icon. Works offline after the first visit." hidden></div>
+          <div class="setting-row">
+            <div><b>Dark mode</b><p class="muted">Follows your device until you change it here.</p></div>
+            <button type="button" class="themesw" id="themeBtn2" role="switch" aria-checked="false" aria-label="Dark mode"><i></i></button>
+          </div>
+          <div class="setting-row">
+            <div><b>Your notes</b><p class="muted" id="statsLine"></p></div>
+            <button type="button" class="btn mb-share-btn" data-action="share-stats"><svg class="uic" aria-hidden="true"><use href="#i-share"/></svg>Share</button>
+          </div>
+          <div class="setting-row">
+            <div><b>Storage used</b><p class="muted" id="storageLine"></p></div>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="s-help">
+          <h2 id="s-help">Tips</h2>
+          <dl class="tips">
+            <dt>Tags</dt><dd>Type <code>#idea</code> anywhere in a note. Tags appear in the sidebar so you can filter by them.</dd>
+            <dt>Links between notes</dt><dd>Type <code>[[Note title]]</code> to link to another note. The linked note lists it under "Linked from".</dd>
+            <dt>Web links</dt><dd>Paste any <code>https://</code> address and it becomes clickable.</dd>
+            <dt>Keyboard</dt><dd><kbd>Esc</kbd> or <kbd>Ctrl</kbd>+<kbd>Enter</kbd> saves and closes. <kbd>Ctrl</kbd>+<kbd>B</kbd> / <kbd>I</kbd> / <kbd>U</kbd> format text. Start a line with <code>• </code> or <code>1. </code> and Enter continues the list.</dd>
+            <dt>Can I install it like an app?</dt><dd>In Chrome or Edge, use Install above (or the install icon in the address bar). On iPhone, tap Share, then Add to Home Screen.</dd>
+          </dl>
+        </section>
+
+        <section class="card danger-zone" aria-labelledby="s-about">
+          <h2 id="s-about">About</h2>
+          <p class="muted">mbnotes.online is a free app by Matthew Broyer. No account, no ads, no tracking. <a href="privacy.html">Privacy</a> · <a href="https://matthewbroyer.com/" rel="noopener">More free apps</a></p>
+          <div class="setting-row">
+            <div><b>Delete all notes</b><p class="muted">Removes every note from this browser, including Archive and Trash. Export a backup first if you might want them back.</p></div>
+            <button type="button" class="btn danger" data-action="delete-all">Delete all…</button>
+          </div>
+        </section>
       </div>
+    </section>
+  </main>
+</div>
+
+<nav class="bnav" id="bnav" aria-label="Sections">
+  <button type="button" data-view="all" aria-current="page"><svg class="uic"><use href="#i-notes"/></svg><span>Notes</span></button>
+  <button type="button" data-view="checklist"><svg class="uic"><use href="#i-check"/></svg><span>Checklists</span></button>
+  <button type="button" data-view="archive"><svg class="uic"><use href="#i-archive"/></svg><span>Archive</span></button>
+  <button type="button" data-view="trash"><svg class="uic"><use href="#i-trash"/></svg><span>Trash</span></button>
+  <button type="button" data-view="settings"><svg class="uic"><use href="#i-settings"/></svg><span>Settings</span></button>
+</nav>
+
+<!-- note editor -->
+<dialog id="modal" class="editor-dlg note-c bg-white" aria-labelledby="e-title-label">
+  <div class="dlg-body">
+    <label class="sr" id="e-title-label" for="e-title">Note title</label>
+    <input id="e-title" class="e-title" placeholder="Title" autocomplete="off">
+    <div class="fmt" role="toolbar" aria-label="Formatting">
+      <button type="button" class="ib" data-cmd="bold" aria-label="Bold" title="Bold (Ctrl+B)"><svg class="uic"><use href="#i-bold"/></svg></button>
+      <button type="button" class="ib" data-cmd="italic" aria-label="Italic" title="Italic (Ctrl+I)"><svg class="uic"><use href="#i-italic"/></svg></button>
+      <button type="button" class="ib" data-cmd="underline" aria-label="Underline" title="Underline (Ctrl+U)"><svg class="uic"><use href="#i-underline"/></svg></button>
+      <button type="button" class="ib" data-cmd="strikeThrough" aria-label="Strikethrough" title="Strikethrough"><svg class="uic"><use href="#i-strike"/></svg></button>
+      <span class="sep" aria-hidden="true"></span>
+      <button type="button" class="ib" data-list="bullet" aria-label="Bullet list" title="Bullet list"><svg class="uic"><use href="#i-ul"/></svg></button>
+      <button type="button" class="ib" data-list="number" aria-label="Numbered list" title="Numbered list"><svg class="uic"><use href="#i-ol"/></svg></button>
+      <span class="sep" aria-hidden="true"></span>
+      <button type="button" class="ib" data-cmd="undo" aria-label="Undo" title="Undo (Ctrl+Z)"><svg class="uic"><use href="#i-undo"/></svg></button>
+      <button type="button" class="ib" data-cmd="redo" aria-label="Redo" title="Redo (Ctrl+Y)"><svg class="uic"><use href="#i-redo"/></svg></button>
     </div>
+    <div id="e-content" class="editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Note text" data-placeholder="Write something…"></div>
+    <div id="e-attachments" class="atts"></div>
+    <div id="e-checklist" class="cl-edit" hidden></div>
+    <div id="e-done" class="done-row" hidden>
+      <span><svg class="uic" aria-hidden="true"><use href="#i-check"/></svg>All items done</span>
+      <button type="button" class="btn sm mb-share-btn" data-action="share-checklist"><svg class="uic" aria-hidden="true"><use href="#i-share"/></svg>Share</button>
+    </div>
+    <div id="backlinks" class="backlinks" hidden>
+      <p class="label">Linked from</p>
+      <div id="backlinks-list"></div>
+    </div>
+    <p class="e-meta" id="e-meta"></p>
   </div>
-
-<script>
-class MBNotes {
-  constructor() {
-    this.notes = [];
-    this.filter = 'all';
-    this.tagFilter = null;
-    this.query = '';
-    this.captureColor = 'bg-white';
-    this.captureDark = 'note-white';
-    this.captureChecklist = false;
-    this.captureItems = [];
-    this.captureAttachments = [];
-    this.editColor = 'bg-white';
-    this.editDark = 'note-white';
-    this.editItems = [];
-    this.editAttachments = [];
-    this.editingId = null;
-    this.undoStack = [];
-    this.redoStack = [];
-    this.maxHistory = 40;
-    this.STORAGE_KEY = 'mbnotes_notes_v3';
-    this.autoSaveTimer = null;
-    this.init();
-  }
-
-  async init() {
-    const savedTheme = localStorage.getItem('mbnotes-theme');
-    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.classList.add('dark');
-    }
-    this.loadNotes();
-    this.bindEvents();
-    this.render();
-
-    const hasVisited = localStorage.getItem('mbnotes_has_visited');
-    if (!hasVisited && this.notes.length === 0) {
-      this.seedDemoNotes();
-      localStorage.setItem('mbnotes_has_visited', 'true');
-    }
-  }
-
-  loadNotes() {
-    try {
-      const raw = localStorage.getItem(this.STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) { this.notes = parsed; return; }
-      }
-    } catch (e) {}
-    this.notes = [];
-  }
-
-  persist() {
-    try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.notes)); }
-    catch (e) { alert('Could not save notes. Please export a backup.'); }
-  }
-
-  seedDemoNotes() {
-    this.notes = [
-      {
-        id: crypto.randomUUID(),
-        title: 'Welcome to mbnotes.online',
-        content: 'A fast, local-first notes app.<br><br><b>Try these:</b><br>• Bold / Italic / lists<br>• [[Project ideas]] links<br>• #tags<br>• https://example.com becomes clickable<br><br>Notes auto-save.',
-        color: 'bg-amber-100', darkClass: 'note-amber', pinned: true,
-        isChecklist: false, checklistItems: [], attachments: [], tags: ['welcome'],
-        archived: false, trashed: false,
-        createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
-      },
-      {
-        id: crypto.randomUUID(),
-        title: 'Project ideas',
-        content: 'Link back with [[Project ideas]].',
-        color: 'bg-white', darkClass: 'note-white', pinned: false,
-        isChecklist: false, checklistItems: [], attachments: [], tags: ['ideas'],
-        archived: false, trashed: false,
-        createdAt: new Date(Date.now() - 3600000).toISOString(),
-        updatedAt: new Date(Date.now() - 3600000).toISOString()
-      },
-      {
-        id: crypto.randomUUID(),
-        title: 'Shopping list',
-        content: '',
-        color: 'bg-emerald-100', darkClass: 'note-emerald', pinned: false,
-        isChecklist: true,
-        checklistItems: [
-          { text: 'Milk', completed: false },
-          { text: 'Eggs', completed: true },
-          { text: 'Sourdough bread', completed: false }
-        ],
-        attachments: [], tags: ['personal'], archived: false, trashed: false,
-        createdAt: new Date(Date.now() - 7200000).toISOString(),
-        updatedAt: new Date(Date.now() - 7200000).toISOString()
-      }
-    ];
-    this.persist();
-    this.render();
-  }
-
-  colorToDark(color) {
-    return {
-      'bg-white': 'note-white', 'bg-amber-100': 'note-amber',
-      'bg-emerald-100': 'note-emerald', 'bg-sky-100': 'note-sky',
-      'bg-purple-100': 'note-purple', 'bg-rose-100': 'note-rose'
-    }[color] || 'note-white';
-  }
-
-  saveState(html) {
-    this.undoStack.push(html);
-    if (this.undoStack.length > this.maxHistory) this.undoStack.shift();
-    this.redoStack = [];
-  }
-
-  undo() {
-    const el = this.editingId ? document.getElementById('e-content') : document.getElementById('c-content');
-    if (!el || this.undoStack.length === 0) return;
-    this.redoStack.push(el.innerHTML);
-    el.innerHTML = this.undoStack.pop();
-  }
-
-  redo() {
-    const el = this.editingId ? document.getElementById('e-content') : document.getElementById('c-content');
-    if (!el || this.redoStack.length === 0) return;
-    this.undoStack.push(el.innerHTML);
-    el.innerHTML = this.redoStack.pop();
-  }
-
-  getActiveEditor() {
-    return this.editingId ? document.getElementById('e-content') : document.getElementById('c-content');
-  }
-
-  insertAtCursor(text) {
-    const el = this.getActiveEditor();
-    if (!el) return;
-    el.focus();
-
-    const sel = window.getSelection();
-    if (!sel.rangeCount) {
-      // fallback if no selection
-      el.innerHTML += text;
-      this.saveState(el.innerHTML);
-      el.dispatchEvent(new Event('input', { bubbles: true }));
-      return;
-    }
-
-    const range = sel.getRangeAt(0);
-    range.deleteContents();
-    const textNode = document.createTextNode(text);
-    range.insertNode(textNode);
-    range.setStartAfter(textNode);
-    range.setEndAfter(textNode);
-    sel.removeAllRanges();
-    sel.addRange(range);
-
-    this.saveState(el.innerHTML);
-    el.dispatchEvent(new Event('input', { bubbles: true }));
-  }
-
-  insertList(type) {
-    const el = this.getActiveEditor();
-    if (!el) return;
-    el.focus();
-    if (type === 'bullet') this.insertAtCursor('• ');
-    else this.insertAtCursor('1. ');
-  }
-
-  // More reliable current-line extraction for contenteditable
-  getCurrentLine(el) {
-    const sel = window.getSelection();
-    if (!sel.rangeCount) return '';
-
-    const range = sel.getRangeAt(0);
-    const preRange = document.createRange();
-    preRange.selectNodeContents(el);
-    preRange.setEnd(range.startContainer, range.startOffset);
-
-    const temp = document.createElement('div');
-    temp.appendChild(preRange.cloneContents());
-
-    // Normalize HTML → plain text with real newlines
-    let html = temp.innerHTML
-      .replace(/<br\s*\/?>/gi, '\n')
-      .replace(/<\/(div|p|li|h[1-6])>/gi, '\n')
-      .replace(/<[^>]+>/g, '')
-      .replace(/&nbsp;/gi, ' ')
-      .replace(/\u00a0/g, ' ');
-
-    // Decode basic entities
-    const textarea = document.createElement('textarea');
-    textarea.innerHTML = html;
-    const text = textarea.value;
-
-    const lines = text.split(/\n/);
-    return (lines[lines.length - 1] || '').trimEnd();
-  }
-
-  handleListEnter(e, el) {
-    if (e.key !== 'Enter' || e.shiftKey) return;
-
-    const currentLine = this.getCurrentLine(el);
-
-    // Bullet list
-    if (/^\s*•\s*/.test(currentLine) || currentLine.trim() === '•') {
-      e.preventDefault();
-      const isEmpty = /^\s*•\s*$/.test(currentLine);
-      document.execCommand('insertHTML', false, isEmpty ? '<br>' : '<br>• ');
-      this.saveState(el.innerHTML);
-      return;
-    }
-
-    // Numbered list
-    const numMatch = currentLine.match(/^\s*(\d+)\.\s*/);
-    if (numMatch) {
-      e.preventDefault();
-      const nextNum = parseInt(numMatch[1], 10) + 1;
-      const isEmpty = /^\s*\d+\.\s*$/.test(currentLine);
-      document.execCommand('insertHTML', false, isEmpty ? '<br>' : `<br>${nextNum}. `);
-      this.saveState(el.innerHTML);
-    }
-  }
-
-  bindEvents() {
-    const sidebar = document.getElementById('sidebar');
-    const backdrop = document.getElementById('sidebar-backdrop');
-    
-    document.getElementById('sidebar-toggle').onclick = () => {
-      sidebar.classList.toggle('-translate-x-full');
-      backdrop.classList.toggle('hidden');
-    };
-    backdrop.onclick = () => {
-      sidebar.classList.add('-translate-x-full');
-      backdrop.classList.add('hidden');
-    };
-
-    document.getElementById('theme-toggle').onclick = () => {
-      document.documentElement.classList.toggle('dark');
-      localStorage.setItem('mbnotes-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-    };
-
-    let t;
-    document.getElementById('search').oninput = e => {
-      clearTimeout(t);
-      t = setTimeout(() => {
-        this.query = e.target.value.trim().toLowerCase();
-        this.render();
-      }, 150);
-    };
-
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.onclick = () => {
-        this.filter = btn.dataset.filter;
-        this.tagFilter = null;
-        document.querySelectorAll('.nav-btn').forEach(b => {
-          b.classList.remove('active', 'bg-amber-50', 'text-amber-700');
-          b.classList.add('text-gray-600');
-        });
-        btn.classList.add('active', 'bg-amber-50', 'text-amber-700');
-        btn.classList.remove('text-gray-600');
-        this.render();
-      };
-    });
-
-    document.getElementById('c-content').onfocus = () => this.expandCapture();
-    
-    const scheduleEditSave = () => {
-      clearTimeout(this.autoSaveTimer);
-      this.autoSaveTimer = setTimeout(() => this.autoSaveEdit(), 500);
-    };
-    document.getElementById('e-content').addEventListener('input', scheduleEditSave);
-    document.getElementById('e-title').addEventListener('input', scheduleEditSave);
-
-    ['c-content', 'e-content'].forEach(id => {
-      const el = document.getElementById(id);
-      el.addEventListener('keydown', e => this.handleListEnter(e, el));
-      el.addEventListener('input', () => this.saveState(el.innerHTML));
-    });
-
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') {
-        if (this.editingId) this.closeModal();
-        else this.closeCapture();
-      }
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-        if (this.editingId) this.closeModal();
-        else this.closeCapture();
-      }
-      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
-        e.preventDefault(); this.undo();
-      }
-      if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.shiftKey && e.key === 'Z'))) {
-        e.preventDefault(); this.redo();
-      }
-    });
-
-    document.querySelectorAll('.format-btn').forEach(btn => {
-      btn.onclick = (e) => {
-        e.preventDefault();
-        const el = this.getActiveEditor();
-        if (el) el.focus();
-        document.execCommand(btn.dataset.cmd, false, null);
-      };
-    });
-
-    document.querySelectorAll('.list-btn').forEach(btn => {
-      btn.onclick = (e) => {
-        e.preventDefault();
-        this.insertList(btn.dataset.type);
-      };
-    });
-
-    document.querySelectorAll('.color-btn').forEach(btn => {
-      btn.onclick = () => {
-        this.captureColor = btn.dataset.color;
-        this.captureDark = btn.dataset.dark;
-        document.getElementById('capture').className = `max-w-2xl mx-auto mb-8 rounded-2xl border shadow-sm transition-all ${this.captureColor}`;
-      };
-    });
-
-    document.querySelectorAll('.ecolor-btn').forEach(btn => {
-      btn.onclick = () => {
-        this.editColor = btn.dataset.ecolor;
-        this.editDark = btn.dataset.edark;
-        document.getElementById('modal-card').className = 
-          `rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col ${this.editColor} ${this.editDark}`;
-        this.autoSaveEdit();
-      };
-    });
-
-    document.getElementById('toggle-checklist').onclick = () => {
-      this.captureChecklist = !this.captureChecklist;
-      document.getElementById('c-checklist').classList.toggle('hidden', !this.captureChecklist);
-      if (this.captureChecklist && this.captureItems.length === 0) {
-        this.captureItems = [{ text: '', completed: false }];
-        this.renderCaptureChecklist();
-      }
-    };
-
-    document.getElementById('e-toggle-checklist').onclick = () => {
-      if (this.editItems.length > 0) {
-        const text = this.editItems.map(i => (i.completed ? '☑ ' : '☐ ') + i.text).join('<br>');
-        document.getElementById('e-content').innerHTML += (document.getElementById('e-content').innerHTML ? '<br><br>' : '') + text;
-        this.editItems = [];
-        document.getElementById('e-checklist').classList.add('hidden');
-      } else {
-        this.editItems = [{ text: '', completed: false }];
-        document.getElementById('e-checklist').classList.remove('hidden');
-        this.renderEditChecklist();
-      }
-      this.autoSaveEdit();
-    };
-
-    document.getElementById('share-btn').onclick = () => this.shareNote();
-    document.getElementById('modal').onclick = e => { if (e.target.id === 'modal') this.closeModal(); };
-  }
-
-  expandCapture() {
-    document.getElementById('c-title').classList.remove('hidden');
-    document.getElementById('c-controls').classList.remove('hidden');
-    document.getElementById('c-format-bar').classList.remove('hidden');
-    document.getElementById('capture').classList.add('ring-2', 'ring-amber-400/40');
-  }
-
-  isEmptyNote(title, content, items, attachments) {
-    const plain = (content || '').replace(/<[^>]+>/g, '').trim();
-    return !title.trim() && !plain && items.filter(i => i.text.trim()).length === 0 && attachments.length === 0;
-  }
-
-  closeCapture() {
-    const title = document.getElementById('c-title').value.trim();
-    const content = document.getElementById('c-content').innerHTML.trim();
-    const items = this.captureItems.filter(i => i.text.trim());
-
-    if (!this.isEmptyNote(title, content, items, this.captureAttachments)) {
-      const note = {
-        id: crypto.randomUUID(),
-        title: title || (content.replace(/<[^>]+>/g, '').slice(0, 48) || 'Untitled'),
-        content,
-        color: this.captureColor,
-        darkClass: this.captureDark,
-        pinned: false,
-        isChecklist: items.length > 0,
-        checklistItems: items,
-        attachments: [...this.captureAttachments],
-        tags: this.extractTags(title + ' ' + content.replace(/<[^>]+>/g, '')),
-        archived: false, trashed: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      this.notes.unshift(note);
-      this.persist();
-    }
-
-    document.getElementById('c-title').value = '';
-    document.getElementById('c-content').innerHTML = '';
-    document.getElementById('c-title').classList.add('hidden');
-    document.getElementById('c-controls').classList.add('hidden');
-    document.getElementById('c-format-bar').classList.add('hidden');
-    document.getElementById('c-checklist').classList.add('hidden');
-    document.getElementById('c-attachments').classList.add('hidden');
-    document.getElementById('capture').className = 'max-w-2xl mx-auto mb-8 bg-white rounded-2xl border shadow-sm transition-all';
-    this.captureColor = 'bg-white';
-    this.captureDark = 'note-white';
-    this.captureChecklist = false;
-    this.captureItems = [];
-    this.captureAttachments = [];
-    this.undoStack = [];
-    this.redoStack = [];
-    this.render();
-  }
-
-  autoSaveEdit() {
-    if (!this.editingId) return;
-    const note = this.notes.find(n => n.id === this.editingId);
-    if (!note) return;
-
-    const title = document.getElementById('e-title').value.trim();
-    const content = document.getElementById('e-content').innerHTML.trim();
-    const items = this.editItems.filter(i => i.text.trim());
-
-    if (this.isEmptyNote(title, content, items, this.editAttachments)) return;
-
-    note.title = title || 'Untitled';
-    note.content = content;
-    note.color = this.editColor;
-    note.darkClass = this.editDark;
-    note.checklistItems = items;
-    note.isChecklist = items.length > 0;
-    note.attachments = [...this.editAttachments];
-    note.tags = this.extractTags(note.title + ' ' + note.content.replace(/<[^>]+>/g, ''));
-    note.updatedAt = new Date().toISOString();
-    this.persist();
-  }
-
-  async handleFiles(event, mode) {
-    for (const file of Array.from(event.target.files)) {
-      if (file.size > 4 * 1024 * 1024) {
-        alert(`"${file.name}" is larger than 4 MB and was skipped.`);
-        continue;
-      }
-      const dataUrl = await new Promise(r => {
-        const reader = new FileReader();
-        reader.onload = e => r(e.target.result);
-        reader.readAsDataURL(file);
-      });
-      const att = { id: crypto.randomUUID(), name: file.name, type: file.type, size: file.size, data: dataUrl };
-      if (mode === 'capture') {
-        this.captureAttachments.push(att);
-        this.renderCaptureAttachments();
-      } else {
-        this.editAttachments.push(att);
-        this.renderEditAttachments();
-        this.autoSaveEdit();
-      }
-    }
-    event.target.value = '';
-  }
-
-  renderCaptureAttachments() {
-    const el = document.getElementById('c-attachments');
-    if (!this.captureAttachments.length) { el.classList.add('hidden'); return; }
-    el.classList.remove('hidden');
-    el.innerHTML = this.captureAttachments.map((a, i) => this.attachmentChip(a, i, 'capture')).join('');
-  }
-
-  renderEditAttachments() {
-    document.getElementById('e-attachments').innerHTML = 
-      this.editAttachments.map((a, i) => this.attachmentChip(a, i, 'edit')).join('');
-  }
-
-  attachmentChip(a, i, mode) {
-    const isImage = a.type.startsWith('image/');
-    return `<div class="attachment-chip flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs">
-      ${isImage ? `<img src="${a.data}" class="w-10 h-10 object-cover rounded">` : `<i class="fa-solid fa-file"></i>`}
-      <span class="max-w-[120px] truncate">${this.escape(a.name)}</span>
-      <button onclick="app.removeAttachment(${i}, '${mode}')" class="opacity-60 hover:opacity-100"><i class="fa-solid fa-xmark"></i></button>
-    </div>`;
-  }
-
-  removeAttachment(i, mode) {
-    if (mode === 'capture') {
-      this.captureAttachments.splice(i, 1);
-      this.renderCaptureAttachments();
-    } else {
-      this.editAttachments.splice(i, 1);
-      this.renderEditAttachments();
-      this.autoSaveEdit();
-    }
-  }
-
-  moveChecklistItem(mode, index, direction) {
-    const items = mode === 'capture' ? this.captureItems : this.editItems;
-    const newIndex = index + direction;
-    if (newIndex < 0 || newIndex >= items.length) return;
-    [items[index], items[newIndex]] = [items[newIndex], items[index]];
-    if (mode === 'capture') this.renderCaptureChecklist();
-    else { this.renderEditChecklist(); this.autoSaveEdit(); }
-  }
-
-  renderCaptureChecklist() {
-    const el = document.getElementById('c-checklist');
-    el.innerHTML = this.captureItems.map((item, i) => `
-      <div class="flex items-center gap-2">
-        <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="app.captureItems[${i}].completed = this.checked">
-        <input type="text" value="${this.escape(item.text)}" placeholder="List item" class="flex-1 text-sm bg-transparent outline-none" oninput="app.captureItems[${i}].text = this.value">
-        <button onclick="app.moveChecklistItem('capture', ${i}, -1)" class="opacity-50 hover:opacity-100 p-1" title="Move up"><i class="fa-solid fa-chevron-up text-xs"></i></button>
-        <button onclick="app.moveChecklistItem('capture', ${i}, 1)" class="opacity-50 hover:opacity-100 p-1" title="Move down"><i class="fa-solid fa-chevron-down text-xs"></i></button>
-        <button onclick="app.captureItems.splice(${i},1); app.renderCaptureChecklist()" class="opacity-60 hover:opacity-100"><i class="fa-solid fa-xmark"></i></button>
-      </div>`).join('') + 
-      `<button onclick="app.captureItems.push({text:'',completed:false}); app.renderCaptureChecklist()" class="text-xs text-amber-600 font-medium mt-1">+ Add item</button>`;
-  }
-
-  renderEditChecklist() {
-    const el = document.getElementById('e-checklist');
-    el.innerHTML = this.editItems.map((item, i) => `
-      <div class="flex items-center gap-2">
-        <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="app.editItems[${i}].completed = this.checked; app.renderEditChecklist(); app.autoSaveEdit()">
-        <input type="text" value="${this.escape(item.text)}" class="flex-1 text-sm bg-transparent outline-none" oninput="app.editItems[${i}].text = this.value; app.autoSaveEdit()">
-        <button onclick="app.moveChecklistItem('edit', ${i}, -1)" class="opacity-50 hover:opacity-100 p-1" title="Move up"><i class="fa-solid fa-chevron-up text-xs"></i></button>
-        <button onclick="app.moveChecklistItem('edit', ${i}, 1)" class="opacity-50 hover:opacity-100 p-1" title="Move down"><i class="fa-solid fa-chevron-down text-xs"></i></button>
-        <button onclick="app.editItems.splice(${i},1); app.renderEditChecklist(); app.autoSaveEdit()" class="opacity-60 hover:opacity-100"><i class="fa-solid fa-xmark"></i></button>
-      </div>`).join('') + 
-      `<button onclick="app.editItems.push({text:'',completed:false}); app.renderEditChecklist()" class="text-xs text-amber-600 font-medium">+ Add item</button>`;
-  }
-
-  extractTags(text) {
-    return [...text.matchAll(/#([a-zA-Z0-9_-]+)/g)].map(m => m[1].toLowerCase());
-  }
-
-  async openNote(id) {
-    const note = this.notes.find(n => n.id === id);
-    if (!note) return;
-    this.editingId = id;
-    this.editColor = note.color || 'bg-white';
-    this.editDark = note.darkClass || 'note-white';
-    this.editItems = JSON.parse(JSON.stringify(note.checklistItems || []));
-    this.editAttachments = JSON.parse(JSON.stringify(note.attachments || []));
-    this.undoStack = [];
-    this.redoStack = [];
-
-    document.getElementById('e-title').value = note.title;
-    document.getElementById('e-content').innerHTML = note.content || '';
-    
-    document.getElementById('modal-card').className = 
-      `rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col ${this.editColor} ${this.editDark}`;
-
-    const cl = document.getElementById('e-checklist');
-    if (note.isChecklist || this.editItems.length) {
-      cl.classList.remove('hidden');
-      this.renderEditChecklist();
-    } else cl.classList.add('hidden');
-
-    this.renderEditAttachments();
-
-    const backlinks = this.notes.filter(n => n.id !== id && !n.trashed && (n.content || '').includes(`[[${note.title}]]`));
-    const bl = document.getElementById('backlinks');
-    if (backlinks.length) {
-      bl.classList.remove('hidden');
-      document.getElementById('backlinks-list').innerHTML = backlinks.map(b => 
-        `<button onclick="app.openNote('${b.id}')" class="text-xs bg-black/10 px-2.5 py-1 rounded-lg">${this.escape(b.title)}</button>`
-      ).join('');
-    } else bl.classList.add('hidden');
-
-    document.getElementById('modal').classList.remove('hidden');
-    document.getElementById('e-title').focus();
-  }
-
-  closeModal() {
-    if (!this.editingId) return;
-    const note = this.notes.find(n => n.id === this.editingId);
-    if (note) {
-      const title = document.getElementById('e-title').value.trim();
-      const content = document.getElementById('e-content').innerHTML.trim();
-      const items = this.editItems.filter(i => i.text.trim());
-
-      if (this.isEmptyNote(title, content, items, this.editAttachments)) {
-        this.notes = this.notes.filter(n => n.id !== this.editingId);
-      } else {
-        note.title = title || 'Untitled';
-        note.content = content;
-        note.color = this.editColor;
-        note.darkClass = this.editDark;
-        note.checklistItems = items;
-        note.isChecklist = items.length > 0;
-        note.attachments = [...this.editAttachments];
-        note.tags = this.extractTags(note.title + ' ' + note.content.replace(/<[^>]+>/g, ''));
-        note.updatedAt = new Date().toISOString();
-      }
-      this.persist();
-    }
-
-    this.editingId = null;
-    document.getElementById('modal').classList.add('hidden');
-    this.undoStack = [];
-    this.redoStack = [];
-    this.render();
-  }
-
-  async shareNote() {
-    const note = this.notes.find(n => n.id === this.editingId);
-    if (!note) return;
-    const text = `${note.title}\n\n${note.content.replace(/<[^>]+>/g, '')}`;
-    if (navigator.share) {
-      try { await navigator.share({ title: note.title, text }); } catch {}
-    } else {
-      await navigator.clipboard.writeText(text);
-      alert('Note copied to clipboard');
-    }
-  }
-
-  async toggle(id, field) {
-    const note = this.notes.find(n => n.id === id);
-    if (!note) return;
-    note[field] = !note[field];
-    note.updatedAt = new Date().toISOString();
-    this.persist();
-    this.render();
-  }
-
-  async deletePermanent(id) {
-    if (!confirm('Delete this note permanently?')) return;
-    this.notes = this.notes.filter(n => n.id !== id);
-    this.persist();
-    this.render();
-  }
-
-  async toggleCheckItem(noteId, idx) {
-    const note = this.notes.find(n => n.id === noteId);
-    if (!note?.checklistItems?.[idx]) return;
-    note.checklistItems[idx].completed = !note.checklistItems[idx].completed;
-    note.updatedAt = new Date().toISOString();
-    this.persist();
-    this.render();
-  }
-
-  formatContent(html) {
-    let out = html || '';
-    out = out.replace(/\[\[([^\]]+)\]\]/g, (_, title) => {
-      const target = this.notes.find(n => n.title === title && !n.trashed);
-      return target
-        ? `<span class="note-link" onclick="event.stopPropagation(); app.openNote('${target.id}')">${this.escape(title)}</span>`
-        : `<span class="note-link opacity-60">[[${this.escape(title)}]]</span>`;
-    });
-    out = out.replace(/(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/g, (url) => {
-      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="url-link" onclick="event.stopPropagation()">${this.escape(url)}</a>`;
-    });
-    return out;
-  }
-
-  escape(str) {
-    return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
-
-  timeAgo(iso) {
-    try {
-      const diff = (Date.now() - new Date(iso).getTime()) / 1000;
-      if (diff < 60) return 'just now';
-      if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
-      if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
-      if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
-      return new Date(iso).toLocaleDateString();
-    } catch { return ''; }
-  }
-
-  renderNoteCard(note) {
-    const done = note.checklistItems?.filter(i => i.completed).length || 0;
-    const total = note.checklistItems?.length || 0;
-    const darkCls = note.darkClass || this.colorToDark(note.color);
-
-    return `
-      <div class="masonry-item note-card ${note.color || 'bg-white'} ${darkCls} rounded-2xl p-4 border border-gray-200/80 shadow-sm hover:shadow-md transition cursor-pointer relative group"
-           onclick="app.openNote('${note.id}')">
-        <div class="note-actions absolute top-2.5 right-2.5 flex gap-0.5 rounded-lg px-1 py-0.5">
-          ${!note.trashed ? `
-            <button onclick="event.stopPropagation(); app.toggle('${note.id}','pinned')" class="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-amber-600 rounded-md">
-              <i class="fa-solid fa-thumbtack text-xs ${note.pinned ? 'text-amber-600' : ''}"></i>
-            </button>
-            <button onclick="event.stopPropagation(); app.toggle('${note.id}','archived')" class="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-800 rounded-md">
-              <i class="fa-solid fa-box-archive text-xs"></i>
-            </button>
-            <button onclick="event.stopPropagation(); app.toggle('${note.id}','trashed')" class="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-red-600 rounded-md">
-              <i class="fa-solid fa-trash text-xs"></i>
-            </button>
-          ` : `
-            <button onclick="event.stopPropagation(); app.toggle('${note.id}','trashed')" class="w-7 h-7 flex items-center justify-center text-green-600 rounded-md">
-              <i class="fa-solid fa-rotate-left text-xs"></i>
-            </button>
-            <button onclick="event.stopPropagation(); app.deletePermanent('${note.id}')" class="w-7 h-7 flex items-center justify-center text-red-600 rounded-md">
-              <i class="fa-solid fa-trash-can text-xs"></i>
-            </button>
-          `}
-        </div>
-
-        <h3 class="font-semibold pr-16 mb-1 break-words">${this.escape(note.title)}</h3>
-        <div class="text-sm leading-relaxed mb-3 opacity-90 break-words">${this.formatContent(note.content)}</div>
-
-        ${note.attachments?.length ? `
-          <div class="flex flex-wrap gap-2 mb-3">
-            ${note.attachments.slice(0, 3).map(a => a.type.startsWith('image/') 
-              ? `<img src="${a.data}" class="w-14 h-14 object-cover rounded-lg border">`
-              : `<div class="attachment-chip flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg"><i class="fa-solid fa-file"></i>${this.escape(a.name.slice(0,12))}</div>`
-            ).join('')}
-          </div>
-        ` : ''}
-
-        ${total > 0 ? `
-          <div class="space-y-1 mb-3 pt-2 border-t border-black/10">
-            <div class="text-[11px] opacity-60 mb-1">${done}/${total} done</div>
-            ${note.checklistItems.map((item, i) => `
-              <label class="flex items-center gap-2 text-xs cursor-pointer" onclick="event.stopPropagation()">
-                <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="app.toggleCheckItem('${note.id}', ${i})">
-                <span class="${item.completed ? 'line-through opacity-50' : ''} break-words">${this.escape(item.text)}</span>
-              </label>
-            `).join('')}
-          </div>
-        ` : ''}
-
-        <div class="flex flex-wrap items-center gap-1.5 mt-2">
-          ${note.tags?.map(t => `<span class="text-[11px] font-medium bg-black/10 px-2 py-0.5 rounded-md">#${t}</span>`).join('') || ''}
-          <span class="text-[11px] opacity-50 ml-auto">${this.timeAgo(note.updatedAt)}</span>
-        </div>
-      </div>`;
-  }
-
-  render() {
-    const tagCount = {};
-    this.notes.forEach(n => {
-      if (!n.trashed && n.tags) n.tags.forEach(t => tagCount[t] = (tagCount[t] || 0) + 1);
-    });
-    document.getElementById('tag-list').innerHTML = Object.entries(tagCount)
-      .sort((a, b) => b[1] - a[1])
-      .map(([tag, count]) => `
-        <button onclick="app.tagFilter='${tag}'; app.filter='tag'; app.render()"
-                class="w-full flex justify-between items-center px-3 py-2 rounded-lg text-xs font-medium
-                       ${this.tagFilter === tag ? 'bg-amber-50 text-amber-700' : 'text-gray-600 hover:bg-gray-100'}">
-          <span>#${tag}</span>
-          <span class="text-gray-400 bg-gray-100 px-1.5 rounded-full text-[10px]">${count}</span>
-        </button>`).join('');
-
-    let list = this.notes.filter(n => {
-      if (this.filter === 'trash') return n.trashed;
-      if (n.trashed) return false;
-      if (this.filter === 'archive') return n.archived;
-      if (n.archived) return false;
-      if (this.filter === 'pinned') return n.pinned;
-      if (this.filter === 'checklist') return n.isChecklist;
-      if (this.filter === 'tag') return n.tags?.includes(this.tagFilter);
-      return true;
-    });
-
-    if (this.query) {
-      list = list.filter(n =>
-        n.title.toLowerCase().includes(this.query) ||
-        (n.content || '').replace(/<[^>]+>/g, '').toLowerCase().includes(this.query) ||
-        n.tags?.some(t => t.includes(this.query))
-      );
-    }
-
-    list.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-
-    const container = document.getElementById('notes');
-    const empty = document.getElementById('empty');
-
-    if (list.length === 0) {
-      container.innerHTML = '';
-      empty.classList.remove('hidden');
-      return;
-    }
-    empty.classList.add('hidden');
-
-    if (this.filter === 'all' && !this.query) {
-      const pinned = list.filter(n => n.pinned);
-      const others = list.filter(n => !n.pinned);
-      let html = '';
-      if (pinned.length) {
-        html += `<div class="mb-6"><div class="section-label">Pinned</div><div class="masonry">${pinned.map(n => this.renderNoteCard(n)).join('')}</div></div>`;
-      }
-      if (others.length) {
-        html += `<div><div class="section-label">${pinned.length ? 'Others' : ''}</div><div class="masonry">${others.map(n => this.renderNoteCard(n)).join('')}</div></div>`;
-      }
-      container.innerHTML = html;
-    } else {
-      container.innerHTML = `<div class="masonry">${list.map(n => this.renderNoteCard(n)).join('')}</div>`;
-    }
-  }
-
-  exportJSON() {
-    const data = JSON.stringify(this.notes, null, 2);
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([data], { type: 'application/json' }));
-    a.download = `mbnotes-backup-${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-  }
-
-  async importJSON(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    try {
-      const data = JSON.parse(await file.text());
-      if (!Array.isArray(data)) throw new Error();
-      if (!confirm(`Import ${data.length} notes? This replaces your current notes.`)) return;
-      this.notes = data;
-      this.persist();
-      this.render();
-    } catch { alert('Could not read that file.'); }
-    e.target.value = '';
-  }
-}
-
-const app = new MBNotes();
-</script>
+  <div class="dlg-bar">
+    <div class="tools">
+      <div class="swatches" role="group" aria-label="Note color" data-swatches="edit"></div>
+      <button type="button" class="ib" id="e-toggle-checklist" aria-label="Checklist" title="Checklist" aria-pressed="false"><svg class="uic"><use href="#i-check"/></svg></button>
+      <label class="ib" title="Attach a file (4 MB max)"><svg class="uic" aria-hidden="true"><use href="#i-clip"/></svg><span class="sr">Attach a file</span>
+        <input type="file" class="sr" multiple accept="image/*,.pdf,.txt,.md,.doc,.docx,.zip" data-files="edit">
+      </label>
+      <button type="button" class="ib" id="e-pin" aria-pressed="false" aria-label="Pin" title="Pin"><svg class="uic"><use href="#i-pin"/></svg></button>
+      <button type="button" class="ib" id="e-archive" aria-label="Archive" title="Archive"><svg class="uic"><use href="#i-archive"/></svg></button>
+      <button type="button" class="ib" id="share-btn" aria-label="Share note text" title="Share note text"><svg class="uic"><use href="#i-link"/></svg></button>
+      <button type="button" class="ib danger" id="e-trash" aria-label="Move to Trash" title="Move to Trash"><svg class="uic"><use href="#i-trash"/></svg></button>
+    </div>
+    <button type="button" class="btn primary sm" data-action="close-modal">Done</button>
+  </div>
+</dialog>
+
+<!-- confirm / choice dialog -->
+<dialog id="ask" class="ask-dlg" aria-labelledby="askTitle" aria-describedby="askText">
+  <form method="dialog">
+    <h3 id="askTitle"></h3>
+    <p id="askText"></p>
+    <div class="ask-btns" id="askBtns"></div>
+  </form>
+</dialog>
+
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+<input type="file" id="importFile" class="sr" accept=".json,application/json" tabindex="-1" aria-hidden="true">
+<input type="file" id="keepFile" class="sr" accept=".zip,.json,application/zip,application/json" multiple tabindex="-1" aria-hidden="true">
+
+<template id="shareArt"><svg class="cu-art" viewBox="0 0 640 136" preserveAspectRatio="xMaxYMax slice" aria-hidden="true" focusable="false"><circle class="b" cx="560" cy="46" r="26"/><path class="s" d="M210 150 C315 80 525 80 630 150Z"/><path class="m" d="M410 150 C485 66 635 66 710 150Z"/><path class="d" d="M530 150 C585 90 695 90 750 150Z"/><path class="n" transform="translate(470 98) rotate(-64) scale(0.5)" d="M0 0 C 20 -34 66 -40 96 -6 C 70 28 22 34 0 0Z"/><path class="d" transform="translate(480 98) rotate(-116) scale(0.4)" d="M0 0 C 20 -34 66 -40 96 -6 C 70 28 22 34 0 0Z"/><circle class="r" cx="360" cy="44" r="6"/></svg></template>
+<template id="emptyArt"><svg class="cu-art inline" viewBox="0 0 160 120" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path class="s" transform="translate(80 98)" d="M-48 2.2 C-48 -15.8 26.4 -16.5 48 -1.5 C49 14.2 -26.4 16.5 -48 2.2Z"/><path class="sd" d="M80 92 C75.6 71.8 83.3 54 80 41.4"/><path class="d" transform="translate(80 41.4) rotate(-38) scale(0.5)" d="M0 0 C 20 -34 66 -40 96 -6 C 70 28 22 34 0 0Z"/><path class="m" transform="translate(80 52.5) rotate(-150) scale(0.4)" d="M0 0 C 20 -34 66 -40 96 -6 C 70 28 22 34 0 0Z"/><circle class="b" cx="122" cy="40" r="7"/><path class="m" transform="translate(40 104)" d="M-13 0.9 C-13 -6.3 7.2 -6.6 13 -0.6 C13.3 5.7 -7.2 6.6 -13 0.9Z"/></svg></template>
+
+<script src="mb-title.js"></script>
+<script src="mb-install.js"></script>
+<script src="mb-share.js"></script>
+<script src="keep-import.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
