@@ -2,6 +2,12 @@
 
 Newest first. One entry per release, in plain words a user would understand.
 
+## 1.1 · 2026-10-14
+- About card at the bottom of Settings: version, release date, links and copyright in one place.
+- Installing from matthewbroyer.com: the hub's Install button opens the app with a short install prompt.
+- New "page not found" page that matches the app and links back to it.
+- Settings: the Install card now sits at the bottom of Settings, just above the About card, and the danger card is now called "Delete data".
+
 ## 2026-10-13
 
 **New look and Google Keep import** (Official Web App · v1.0, was Alpha v1.1)

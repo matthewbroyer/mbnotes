@@ -2,7 +2,7 @@
    Network-first for the app's own files, cache as the offline fallback. Never touches user data
    (localStorage / IndexedDB are not involved), never intercepts non-GET or cross-origin requests.
    VERSION changes automatically whenever a cached file changes (make_release.py build). */
-const VERSION = 'mbnotes-20261013-b73430e9';
+const VERSION = 'mbnotes-20261014-889be6f5';
 const SHELL = ['./', 'index.html', 'manifest.json', 'favicon.svg', 'favicon.ico', 'apple-touch-icon.png', 'theme-boot.js', 'mb-suite-core.css', 'app.css', 'mb-suite-cutouts.css', 'mb-suite-sidebar.css', 'mb-suite-v3.css', 'app-v3.css', 'privacy.html', 'mb-title.js', 'mb-install.js', 'mb-share.js', 'keep-import.js', 'app.js', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'];
 
 self.addEventListener('install', e => {
