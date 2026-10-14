@@ -304,6 +304,8 @@ class MBNotes {
     // brand + theme
     $('themeBtn').addEventListener('click', () => this.setTheme(this.isDark() ? 'light' : 'dark'));
     $('themeBtn2').addEventListener('click', () => this.setTheme(this.isDark() ? 'light' : 'dark'));
+    // phones: the bar's search icon jumps to the search field under the banner
+    $('searchTb').addEventListener('click', () => { const f = $('searchPhone'); f.scrollIntoView({ block: 'center' }); f.focus({ preventScroll: true }); });
 
     // Data menu
     $('dataBtn').addEventListener('click', e => { e.stopPropagation(); this.toggleMenu(); });
@@ -443,6 +445,13 @@ class MBNotes {
 
     // keyboard
     document.addEventListener('keydown', e => {
+      if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        const t = e.target, tag = (t && t.tagName || '').toLowerCase();
+        if (!(tag === 'input' || tag === 'textarea' || tag === 'select' || (t && t.isContentEditable) || document.querySelector('dialog[open]'))) {
+          const box = [$('search'), $('searchPhone')].find(el => el && el.offsetParent);
+          if (box) { e.preventDefault(); box.focus(); return; }
+        }
+      }
       if (e.key === 'Escape') {
         if (!$('dataMenu').hidden) { this.closeMenu(true); return; }
         if (!this.editingId && !$('ask').open && this.isCaptureOpen()) this.closeCapture();

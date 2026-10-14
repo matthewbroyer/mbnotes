@@ -2,6 +2,12 @@
 
 Newest first. One entry per release, in plain words a user would understand.
 
+## 1.2 · 2026-10-14
+- On computers, the search box, backup status and logo spacing now look exactly like the other mb apps: same size, same "Search…" text, and the "/" key now jumps to search.
+- Tidier top bar that matches the other apps. On phones it now shows search, Data and a proper light/dark switch as icons, plus the New note button.
+- Data (backup and import) is now reachable from the top bar on phones too.
+- The light/dark switch shows a sun and a moon so it's clear what it does.
+
 ## 1.1 · 2026-10-14
 - About card at the bottom of Settings: version, release date, links and copyright in one place.
 - Installing from matthewbroyer.com: the hub's Install button opens the app with a short install prompt.

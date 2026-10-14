@@ -32,6 +32,10 @@
 }
 .cu-banner{max-width:none}
 .page-bar .actions{flex-wrap:nowrap}
+/* v1.2 · standard top bar (mb-suite-topbar.css loads after this): app-only bits */
+.page-bar .actions .searchbox input{height:var(--tb-h)}
+.page-bar .actions .menu-wrap{display:flex}
+@media (min-width:768px){.page-bar .actions .tb.nb-phone-only{display:none}}
 .side-tags{max-height:40vh;overflow-y:auto}
 .side-tags button{min-height:34px;font-size:13.5px}
 .side-tags .hash{width:18px;text-align:center;font-weight:650;opacity:.7}
